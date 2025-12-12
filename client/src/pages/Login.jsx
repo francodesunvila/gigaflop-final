@@ -41,6 +41,9 @@ const handleLogin = async () => {
   }
 }; 
 
+console.log('API base:', process.env.REACT_APP_API_BASE);
+
+
   return (
     <>
       <div className="background-container">
