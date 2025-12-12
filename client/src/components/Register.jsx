@@ -148,24 +148,27 @@ const handleGuardar = async () => {
   };
 
   try {
-    console.log("Enviando cliente:", nuevoCliente);
-    await axios.post("http://localhost:4000/api/clientes/completo", nuevoCliente);
+  console.log("Enviando cliente:", nuevoCliente);
+  await axios.post(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/completo`,
+    nuevoCliente
+  );
 
-    setInfo("Cliente guardado correctamente");
-    document.querySelector(".modal-body")?.scrollTo({ top: 0, behavior: "smooth" });
-    setError("");
-  } catch (err) {
-    console.error("Error al guardar cliente:", err.response?.data || err.message);
+  setInfo("Cliente guardado correctamente");
+  document.querySelector(".modal-body")?.scrollTo({ top: 0, behavior: "smooth" });
+  setError("");
+} catch (err) {
+  console.error("Error al guardar cliente:", err.response?.data || err.message);
 
-    if (err.response?.status === 409) {
-      // Caso de conflicto: cliente ya existe
-      setError("Ya existe un cliente con ese CUIT.");
-    } else {
-      setError("Error al guardar el cliente");
-    }
-
-    setInfo("");
+  if (err.response?.status === 409) {
+    // Caso de conflicto: cliente ya existe
+    setError("Ya existe un cliente con ese CUIT.");
+  } else {
+    setError("Error al guardar el cliente");
   }
+
+  setInfo("");
+}
 };
 
   // Cancelar

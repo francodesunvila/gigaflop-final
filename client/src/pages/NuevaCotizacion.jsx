@@ -1126,15 +1126,16 @@ const NuevaCotizacion = () => {
 
 
   // Cargar todas las zonas de envío con su costo al montar el componente
-  useEffect(() => {
-    fetch('http://localhost:4000/api/clientes/envios/zonas')
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('Zonas recibidas:', data);
-        setZonasEnvio(data);
-      })
-      .catch((err) => console.error('Error al cargar zonas de envío:', err));
-  }, []);
+useEffect(() => {
+  fetch(`${process.env.REACT_APP_API_BASE}/api/clientes/envios/zonas`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Zonas recibidas:', data);
+      setZonasEnvio(data);
+    })
+    .catch((err) => console.error('Error al cargar zonas de envío:', err));
+}, []);
+
 
 
 
