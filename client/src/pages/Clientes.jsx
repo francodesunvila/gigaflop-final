@@ -46,28 +46,30 @@ const Clientes = () => {
     return { ...cliente, condiciones_comerciales: condiciones };
   };
 
-  const handleVistaPrevia = async (cliente) => {
-    try {
-      const res = await axios.get(`http://localhost:4000/api/clientes/completo/${cliente.cuit}`);
-      setClienteSeleccionado(res.data);
-      setModalVistaPreviaVisible(true);
-    } catch (error) {
-      console.error('Error al obtener datos del cliente:', error);
-      setMensajeError('No se pudo cargar la vista previa del cliente');
-    }
-  };
+const handleVistaPrevia = async (cliente) => {
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_BASE}/api/clientes/completo/${cliente.cuit}`);
+    setClienteSeleccionado(res.data);
+    setModalVistaPreviaVisible(true);
+  } catch (error) {
+    console.error('Error al obtener datos del cliente:', error);
+    setMensajeError('No se pudo cargar la vista previa del cliente');
+  }
+};
 
-  const obtenerClientes = () => {
-    axios.get('http://localhost:4000/api/clientes')
-      .then((res) => {
-        setClientes(res.data);
-        setMensajeError('');
-      })
-      .catch(() => {
-        setClientes([]);
-        setMensajeError('Error al recuperar la lista de clientes');
-      });
-  };
+
+const obtenerClientes = () => {
+  axios.get(`${process.env.REACT_APP_API_BASE}/api/clientes`)
+    .then((res) => {
+      setClientes(res.data);
+      setMensajeError('');
+    })
+    .catch(() => {
+      setClientes([]);
+      setMensajeError('Error al recuperar la lista de clientes');
+    });
+};
+
 
   useEffect(() => {
     obtenerClientes();
@@ -79,19 +81,19 @@ const Clientes = () => {
       return;
     }
 
-    const delay = setTimeout(() => {
-      axios.get(`http://localhost:4000/api/clientes/buscar/${encodeURIComponent(busqueda)}`)
-        .then((res) => {
-          const data = res.data;
-          const lista = Array.isArray(data) ? data : [data];
-          setClientes(lista);
-          setMensajeError('');
-        })
-        .catch(() => {
-          setClientes([]);
-          setMensajeError('Cliente no encontrado');
-        });
-    }, 400);
+ const delay = setTimeout(() => {
+  axios.get(`${process.env.REACT_APP_API_BASE}/api/clientes/buscar/${encodeURIComponent(busqueda)}`)
+    .then((res) => {
+      const data = res.data;
+      const lista = Array.isArray(data) ? data : [data];
+      setClientes(lista);
+      setMensajeError('');
+    })
+    .catch(() => {
+      setClientes([]);
+      setMensajeError('Cliente no encontrado');
+    });
+}, 400);
 
     return () => clearTimeout(delay);
   }, [busqueda]);
@@ -100,17 +102,18 @@ const Clientes = () => {
     setClienteAEliminar(cliente);
   };
 
-  const confirmarEliminacion = async () => {
-    try {
-      await axios.delete(`http://localhost:4000/api/clientes/${clienteAEliminar.cuit}`);
-      setClientes(clientes.filter((c) => c.cuit !== clienteAEliminar.cuit));
-      setClienteAEliminar(null);
-    } catch (error) {
-      console.error('Error al eliminar cliente:', error);
-      setMensajeError('No se pudo eliminar el cliente');
-      setClienteAEliminar(null);
-    }
-  };
+const confirmarEliminacion = async () => {
+  try {
+    await axios.delete(`${process.env.REACT_APP_API_BASE}/api/clientes/${clienteAEliminar.cuit}`);
+    setClientes(clientes.filter((c) => c.cuit !== clienteAEliminar.cuit));
+    setClienteAEliminar(null);
+  } catch (error) {
+    console.error('Error al eliminar cliente:', error);
+    setMensajeError('No se pudo eliminar el cliente');
+    setClienteAEliminar(null);
+  }
+};
+
 
   const cancelarEliminacion = () => {
     setClienteAEliminar(null);
@@ -120,18 +123,19 @@ const Clientes = () => {
 
 
 
-  const handleEditar = async (cliente) => {
-    try {
-      const res = await axios.get(`http://localhost:4000/api/clientes/completo/${cliente.cuit}`);
-      setClienteAEditar(prepararClienteParaEditar(res.data));
-      setMensajeExito('');
-      setMensajeError('');
-      setModalVisible(true);
-    } catch (error) {
-      console.error('Error al obtener cliente completo:', error);
-      setMensajeError('No se pudo cargar la información del cliente');
-    }
-  };
+const handleEditar = async (cliente) => {
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_BASE}/api/clientes/completo/${cliente.cuit}`);
+    setClienteAEditar(prepararClienteParaEditar(res.data));
+    setMensajeExito('');
+    setMensajeError('');
+    setModalVisible(true);
+  } catch (error) {
+    console.error('Error al obtener cliente completo:', error);
+    setMensajeError('No se pudo cargar la información del cliente');
+  }
+};
+
 
   useEffect(() => {
     document.body.style.overflow = modalVisible ? 'hidden' : 'auto';
@@ -152,30 +156,31 @@ const Clientes = () => {
 
     try {
       // 🟦 Datos generales
-      await axios.put(`http://localhost:4000/api/clientes/${clienteAEditar.cuit}`, {
-        razon_social: clienteAEditar.razon_social,
-        cuit: clienteAEditar.cuit,
-        direccion_cliente: clienteAEditar.direccion_cliente
-      });
+await axios.put(`${process.env.REACT_APP_API_BASE}/api/clientes/${clienteAEditar.cuit}`, {
+  razon_social: clienteAEditar.razon_social,
+  cuit: clienteAEditar.cuit,
+  direccion_cliente: clienteAEditar.direccion_cliente
+});
 
-      // 🟨 Direcciones
-      await axios.put(`http://localhost:4000/api/clientes/direcciones/${clienteAEditar.cuit}`, {
-        direcciones: clienteAEditar.direcciones || []
-      });
+// 🟨 Direcciones
+await axios.put(`${process.env.REACT_APP_API_BASE}/api/clientes/direcciones/${clienteAEditar.cuit}`, {
+  direcciones: clienteAEditar.direcciones || []
+});
 
-      // 🟩 Contactos
-      await axios.put(`http://localhost:4000/api/clientes/contactos/${clienteAEditar.cuit}`, {
-        contactos: Array.isArray(clienteAEditar.contactos) ? clienteAEditar.contactos : []
-      });
+// 🟩 Contactos
+await axios.put(`${process.env.REACT_APP_API_BASE}/api/clientes/contactos/${clienteAEditar.cuit}`, {
+  contactos: Array.isArray(clienteAEditar.contactos) ? clienteAEditar.contactos : []
+});
 
-      // 🟧 Condiciones comerciales nuevas confirmadas
-      const nuevasCondiciones = clienteAEditar.condiciones_comerciales?.filter(c => c.__nuevo && c.confirmado);
+// 🟧 Condiciones comerciales nuevas confirmadas
+const nuevasCondiciones = clienteAEditar.condiciones_comerciales?.filter(c => c.__nuevo && c.confirmado);
 
-      if (nuevasCondiciones.length > 0) {
-        await axios.put(`http://localhost:4000/api/clientes/condiciones/${clienteAEditar.cuit}`, {
-          condiciones_comerciales: nuevasCondiciones
-        });
-      }
+if (nuevasCondiciones.length > 0) {
+  await axios.put(`${process.env.REACT_APP_API_BASE}/api/clientes/condiciones/${clienteAEditar.cuit}`, {
+    condiciones_comerciales: nuevasCondiciones
+  });
+}
+
 
       // ✅ Actualizar lista y mostrar éxito
       obtenerClientes();
@@ -194,13 +199,13 @@ const Clientes = () => {
     }
   };
   // 🔽 Agregamos aquí la función para descargar PDF
-  const descargarClientePDF = async (cliente) => {
-    try {
-      // Traer el cliente completo desde el backend
-      const res = await axios.get(`http://localhost:4000/api/clientes/completo/${cliente.cuit}`);
-      const clienteCompleto = res.data;
+const descargarClientePDF = async (cliente) => {
+  try {
+    // Traer el cliente completo desde el backend en Render
+    const res = await axios.get(`${process.env.REACT_APP_API_BASE}/api/clientes/completo/${cliente.cuit}`);
+    const clienteCompleto = res.data;
 
-      const doc = new jsPDF();
+    const doc = new jsPDF();
 
       // Encabezado igual al modal
       doc.setFontSize(16);
