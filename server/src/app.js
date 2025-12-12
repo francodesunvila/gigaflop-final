@@ -21,36 +21,41 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:3000',                      // desarrollo local
-    'https://gigaflop-final.vercel.app',           // producción real
-    'https://gigaflop.vercel.app'
+    "http://localhost:3000",      // desarrollo local
+    "https://gigaflop.vercel.app" // producción
   ],
   credentials: true
 }));
 
+// responder a preflight OPTIONS
+app.options("*", cors({
+  origin: [
+    "http://localhost:3000",
+    "https://gigaflop.vercel.app"
+  ],
+  credentials: true
+}));
 
-//esto es para que el servidor pueda recibir cookies
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/images', express.static('public/images'));
+app.use("/images", express.static("public/images"));
 
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api", menuRoutes);
 app.use("/api/clientes", clientesRoutes);
-app.use("/api", productosRoutes); // Usa las rutas de productos
+app.use("/api", productosRoutes);
 app.use("/api/cotizaciones", cotizacionRoutes);
 app.use("/api", contactosRoutes);
-app.use('/api/estados', estadosRoutes);
-app.use('/api', emailRoutes);
+app.use("/api/estados", estadosRoutes);
+app.use("/api", emailRoutes);
 app.use("/api/configuracion", configuracionRoutes);
 
-
 // Middleware de manejo de errores
-
 app.use((err, req, res, next) => {
-  console.error(' Error no capturado:', err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  console.error("Error no capturado:", err);
+  res.status(500).json({ error: "Error interno del servidor" });
 });
+
 export default app;
