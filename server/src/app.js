@@ -21,11 +21,12 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:3000',                  // para desarrollo local
-    'https://gigaflop-pro-pp3.vercel.app'     // tu frontend en producción
+    'http://localhost:3000',                      // desarrollo local
+    'https://gigaflop-final.vercel.app'           // producción real
   ],
   credentials: true
 }));
+
 
 //esto es para que el servidor pueda recibir cookies
 app.use(morgan('dev'));
