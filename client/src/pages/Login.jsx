@@ -12,10 +12,10 @@ const Login = () => {
 
   const navigate = useNavigate();
 
- const handleLogin = async () => {
+const handleLogin = async () => {
   try {
     const res = await axios.post(
-      '/api/usuarios/login',
+      `${process.env.REACT_APP_API_BASE}/api/usuarios/login`,
       { email, password },
       { withCredentials: true }
     );
