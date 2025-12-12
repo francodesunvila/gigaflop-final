@@ -1,38 +1,54 @@
+// src/routes/cotizacionRoutes.js
 import { Router } from 'express';
 import { authRequired } from '../middlewares/validateToken.js';
 import {
   iniciarCotizacion,
   obtenerCotizacionesBorrador,
-  finalizarCotizacion, verCotizacionCompleta, obtenerCotizacionBorradorPorId,
-  actualizarCotizacionBorrador, marcarCotizacionComoPendiente,
-  actualizarEstado, obtenerTodasLasCotizaciones, listarCotizacionesDashboard
+  finalizarCotizacion,
+  verCotizacionCompleta,
+  obtenerCotizacionBorradorPorId,
+  actualizarCotizacionBorrador,
+  marcarCotizacionComoPendiente,
+  actualizarEstado,
+  obtenerTodasLasCotizaciones,
+  listarCotizacionesDashboard
 } from '../controllers/cotizacionController.js';
 import * as cotizacionController from '../controllers/cotizacionController.js';
 
 const router = Router();
 
-router.post('/iniciar', authRequired,iniciarCotizacion); //crea cotización con cliente y productos completos.
-router.get("/todas/:id_usuario", authRequired, obtenerTodasLasCotizaciones); //muestra todas las cotizaciones de un usuario
+// Crear cotización con cliente y productos completos
+router.post('/iniciar', authRequired, iniciarCotizacion);
 
-// Ruta nueva: usa el token y el rol para decidir qué devolver
+// Mostrar todas las cotizaciones de un usuario específico
+router.get('/todas/usuario/:id_usuario', authRequired, obtenerTodasLasCotizaciones);
+
+// Mostrar todas las cotizaciones (según token/rol)
 router.get('/todas', authRequired, obtenerTodasLasCotizaciones);
 
-
-
-
+// Cotizaciones en borrador
 router.get('/borrador/:id_usuario', authRequired, obtenerCotizacionesBorrador);
-router.get('/borrador/retomar/:id', authRequired, obtenerCotizacionBorradorPorId); // retoma cotización desde backend
-router.put('/finalizar/:id',authRequired, finalizarCotizacion); //finaliza usando el estado local (clienteObjeto, carrito) que está completo.
-router.get('/ver/:id', authRequired, verCotizacionCompleta);// usamos en el modal para ver resumen de cotiz.
-router.put('/:id/actualizar', authRequired, actualizarCotizacionBorrador); // actualiza usando el mismo estado local.
+router.get('/borrador/retomar/:id', authRequired, obtenerCotizacionBorradorPorId);
+
+// Finalizar cotización
+router.put('/finalizar/:id', authRequired, finalizarCotizacion);
+
+// Ver cotización completa
+router.get('/ver/:id', authRequired, verCotizacionCompleta);
+
+// Actualizar borrador
+router.put('/:id/actualizar', authRequired, actualizarCotizacionBorrador);
+
+// Cambiar estado a pendiente
 router.put('/estado/pendiente/:id', marcarCotizacionComoPendiente);
+
+// Actualizar estado
 router.put('/estado/:id', actualizarEstado);
+
+// Enviar alerta de vencimiento
 router.post('/alerta-vencimiento/:id', cotizacionController.enviarAlertaVencimiento);
-// Nueva ruta para dashboard
+
+// Dashboard
 router.get('/dashboard', listarCotizacionesDashboard);
-
-
-
-
 
 export default router;
