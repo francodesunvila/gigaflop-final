@@ -22,7 +22,8 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',                      // desarrollo local
-    'https://gigaflop-final.vercel.app'           // producción real
+    'https://gigaflop-final.vercel.app',           // producción real
+    'https://gigaflop.vercel.app'
   ],
   credentials: true
 }));
