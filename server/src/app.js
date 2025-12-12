@@ -20,8 +20,11 @@ dotenv.config(); //Carga las variables antes de que se usen en cualquier parte d
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:3000', // Cambia si tu frontend está en otra URL
-    credentials: true
+  origin: [
+    'http://localhost:3000',                  // para desarrollo local
+    'https://gigaflop-pro-pp3.vercel.app'     // tu frontend en producción
+  ],
+  credentials: true
 }));
 
 //esto es para que el servidor pueda recibir cookies

@@ -1,0 +1,53 @@
+[33m4ad1157[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mconfig-front-fran[m[33m)[m Arreglo estilos configuracion y header productos
+[33m9b6d3bd[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m modal de resumen para ver la vista previa de cliente 100%
+[33mb2556b2[m merge de main actualizada con la rama de fran a mi rama modal-para-resumen-cliente-dani esta rama tiene modificacion en el bckend directo
+[33md70e248[m Punto antes de hacer el pull request de fran
+[33mfd8a2cb[m Merge pull request #6 from DanielaToledo/estilos-front-fran
+[33m0869db7[m modal para resumen cliente al 90%
+[33m45cd4d9[m modal para ver cotizaciones en resumen en Menu.jsx 100%
+[33m5afffa1[m[33m ([m[1;31morigin/estilos-front-fran[m[33m, [m[1;32mestilos-front-fran[m[33m)[m solucion merge Menu.jsx
+[33m7d5102e[m correccion estilos cliente
+[33m02c764e[m integrar datos del vendedor en vista previa(modal de cotización), modal al 90%
+[33m00db745[m modal de cotizaciones para ver el resumen desde la tabla de cotizaciones esta al 70%
+[33m9084709[m correccion diseño responsive cotizaciones
+[33mb265dfc[m Merge branch 'main' into estilos-front-fran
+[33m5063437[m acceso a la bdd db.js
+[33mce15752[m correccion diseño cotizaciones
+[33mca3631a[m Manejos de estados: borrador, pendiente, finalizada aceptada y finalizada rechazada + Envio de alerta por msj EXITOSO
+[33m2c42698[m envio de cotizacion con pdf + html con los datos del cliente exitoso
+[33mef9d142[m Envio de cotizacion + pdf adjunto exitoso
+[33m7944bcc[m Envio de cotizacion exitoso
+[33md74b3e9[m se genera el ciclo completo de cotizacion y se descarga pdf
+[33m5638b7c[m cotizaciones listas pero sin estados
+[33m075ff0e[m Merge pull request #5 from DanielaToledo/debugueo-para-juan
+[33mbd4a476[m[33m ([m[1;31morigin/debugueo-para-juan[m[33m)[m Debugueo corregido: ya tenemos usuario autenticado y mandando su id_usuario al menu para generar las cotizaciones en estado  borrador y consecuentemente en estado  pendiente
+[33ma088cfa[m problemas con guardar cotizaciones en borrador y con ver borradores
+[33mc194bf3[m agregamos botones de cancelar, guardar borrador, finalizar y enviar. Agregamos boton de actualizar unicamente para los borradores
+[33mfc2aeb1[m Cotizaciones con estados: estado borrador listo para pasar al estado pendiente y finalizado
+[33m512296d[m Cotizaciones en Borrador: funcionando
+[33mf94b074[m actualizacion del modulo clientes
+[33m03420d0[m Funcion de regsitrar a un  nuevo cliente listo
+[33m33b9575[m imagenes servidas correctamente
+[33m687a0ab[m[33m ([m[1;31morigin/franco-clean[m[33m)[m NuevaCotizacion al 80% ya estan conectadas todaslas tablas de la BD
+[33m799c459[m agrego el modal de productos y tambien el buscador de productos fuera del modal
+[33maf2c9a9[m conexion dedesde la BD en condiciones comerciales: forma de pago, tipo de cambio y dias de plazo
+[33m1597bc2[m sincronizacion entre la bd local y la bd remota. Agregamos tambien parte del modulo cotizacion
+[33ma289360[m el calculo de cotizacion esta ok del lado del front
+[33m34d13a3[m Modulo de productos conectado al servidor: ya se pueden realizar las consultas o endpoints de la BD
+[33mfaa4dcf[m unificamos el  modulo productos con el backend y frontend: codigo al dia
+[33ma774e71[m Merge pull request #3 from DanielaToledo/frontend-franco
+[33mbf8bf5a[m Merge pull request #4 from DanielaToledo/dani-api-producto
+[33m4a245e8[m[33m ([m[1;31morigin/dani-api-producto[m[33m)[m Agrego la conexión a la API remota, la sincronización entre la BD local y la BD remota en el módulo productos
+[33m1be62eb[m[33m ([m[1;31morigin/frontend-franco[m[33m)[m actualizacion productos y nueva cotizacion 23-09 gigaflop-pro
+[33m74bbce2[m Merge pull request #2 from DanielaToledo/frontend-franco
+[33m6949845[m prueba push 3
+[33m6427cdf[m sdjs
+[33me5e0782[m update componentes y pages front 07/09/25
+[33m105e207[m prueba push
+[33m7dae5ed[m Agrego la lógica de cotización: controllers, models y routes
+[33m2fb2bb5[m se agregò el modulo productos: su modelo su controlador y su ruta
+[33m5c2f38d[m agrego comentarios de ayuda
+[33m485b14e[m Boton limpiar fue modificado
+[33m360f03e[m Se agrego el Home
+[33m0df7dae[m[33m ([m[1;33mtag: [m[1;33mv1.0.0[m[33m)[m Añadi mas informacion en el README
+[33m9f534eb[m Primer commit completo servidor y cliente
