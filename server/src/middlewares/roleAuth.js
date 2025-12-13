@@ -5,12 +5,16 @@ export const authorize = (rolesPermitidos = []) => {
 
     // Si no hay rol en el token
     if (!userRole) {
-      return res.status(401).json({ message: "No se pudo determinar el rol del usuario" });
+      return res
+        .status(401)
+        .json({ message: "No se pudo determinar el rol del usuario" });
     }
 
     // Si el rol no está permitido
     if (!rolesPermitidos.includes(userRole)) {
-      return res.status(403).json({ message: "Acceso denegado: rol insuficiente" });
+      return res
+        .status(403)
+        .json({ message: "Acceso denegado: rol insuficiente", rol: userRole });
     }
 
     // Si todo está bien, continúa

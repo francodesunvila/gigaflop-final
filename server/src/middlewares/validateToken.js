@@ -1,14 +1,12 @@
 // middlewares/validateToken.js
 import jwt from "jsonwebtoken";
-import { TOKEN_SECRET } from "../config/jwt.js";
 
-// Middleware de validación de Token
+// Middleware de validación de Token usando SOLO cookies
 export const authRequired = (req, res, next) => {
-  // Buscar token en cookie o en header Authorization
-  const token =
-    req.cookies?.token || req.headers.authorization?.split(" ")[1];
+  // Buscar token únicamente en la cookie
+  const token = req.cookies?.token;
 
-  console.log("Token recibido:", token);
+  console.log("Token recibido desde cookie:", token);
 
   if (!token) {
     return res
@@ -17,8 +15,9 @@ export const authRequired = (req, res, next) => {
   }
 
   try {
-    const user = jwt.verify(token, TOKEN_SECRET);
-    req.user = user; // 👈 acá se setea el usuario y rol
+    // Usar la misma clave que en el login
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = user; // acá se setea el usuario y rol
     console.log("Usuario autenticado:", user);
     next();
   } catch (err) {

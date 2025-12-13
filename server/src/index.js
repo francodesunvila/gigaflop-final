@@ -9,6 +9,7 @@ async function startServer() {
 
     app.set('db', pool);// Hacemos la conexión accesible en las rutas a través de req.app.get('db')
 
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
     /*app.listen(4000, () => {
       console.log('>>>>>>>> Servidor corriendo en el puerto 4000 <<<<<<<<' );

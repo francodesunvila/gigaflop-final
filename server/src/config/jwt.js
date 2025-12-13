@@ -1,19 +1,12 @@
-import jwt from 'jsonwebtoken'
+// src/config/jwt.js
+import jwt from "jsonwebtoken";
 
-export const TOKEN_SECRET = "some secret key"
-export function creatAccesToken(payload) {
-    return new Promise((resolve, reject) => {
-        jwt.sign(
-            payload,
-            TOKEN_SECRET,
-            {
-                expiresIn:"1d",
-            },
-            (err,token) => {
-                if (err) reject(err)
-                resolve(token)
-            }
-            );
-    });
+// Usamos la clave desde .env
+const TOKEN_SECRET = process.env.JWT_SECRET;
+
+// Función para crear token de acceso
+export function createAccessToken(payload) {
+  return jwt.sign(payload, TOKEN_SECRET, {
+    expiresIn: "1d",
+  });
 }
-
