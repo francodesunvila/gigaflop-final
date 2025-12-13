@@ -22,6 +22,9 @@ const Productos = () => {
   const [ocultarCart, setOcultarCart] = useState(false);
   const navigate = useNavigate();
 
+  console.log("🔧 API Base configurada:", process.env.REACT_APP_API_BASE);
+
+
   useEffect(() => {
     try {
       const storedCart = localStorage.getItem('gigaflop_cart');
