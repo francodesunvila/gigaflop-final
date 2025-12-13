@@ -306,22 +306,36 @@ const NuevaCotizacion = () => {
     // resolver id_estado: aceptar que caller pase nombre o id
     const resolvedEstadoId = resolveEstadoId(estadoNombreOrId);
 
-    return {
-      id_cliente: normalizarNumero(clienteSeleccionado ?? clienteObjeto?.id ?? cliente) ?? null,
-      id_contacto: contacto ? normalizarNumero(typeof contacto === 'object' ? contacto.id : contacto) : null,
-      id_usuario: normalizarNumero(usuarioActual?.id) ?? null,
-      id_direccion_cliente: normalizarNumero(direccionIdSeleccionada) ?? null,
-      id_condicion: resolvedIdCond || null,
-      vigencia_hasta: toYYYYMMDD(vigenciaHasta) || null,
-      observaciones: observaciones || '',
-      plazo_entrega: plazoEntrega || '',
-      costo_envio: normalizarNumero(costoEnvio) || 0,
-      // reemplazo clave: enviamos id_estado en lugar de 'estado' textual
-      ...(resolvedEstadoId ? { id_estado: resolvedEstadoId } : {}),
-      productos,
-      ...extra
-    };
-  };
+return {
+  id_cliente: normalizarNumero(clienteSeleccionado ?? clienteObjeto?.id ?? cliente) ?? null,
+  id_contacto: contacto
+    ? normalizarNumero(typeof contacto === 'object' ? contacto.id : contacto)
+    : null,
+  id_usuario: normalizarNumero(usuarioActual?.id) ?? null,
+  id_direccion_cliente: normalizarNumero(direccionIdSeleccionada) ?? null,
+
+  // Plazo de pago / condición comercial
+  id_condicion: condicionSeleccionada || resolvedIdCond || null,
+
+  vigencia_hasta: toYYYYMMDD(vigenciaHasta) || null,
+  observaciones: observaciones || '',
+  plazo_entrega: plazoEntrega || '',
+  costo_envio: normalizarNumero(costoEnvio) || 0,
+
+  // Bonificable (checkbox)
+  bonificable: bonificable ? 1 : 0,
+
+  // Tipo de cambio (editable)
+  tipo_cambio: tipoCambio || null,
+
+  // reemplazo clave: enviamos id_estado en lugar de 'estado' textual
+  ...(resolvedEstadoId ? { id_estado: resolvedEstadoId } : {}),
+
+  productos,
+  ...extra
+};
+};
+
 
   // cargar estados (una sola vez)
 useEffect(() => {
@@ -2567,20 +2581,21 @@ const resp = await axios.put(
 
 
             {/* Bonificable */}
-            <div className="col-md-2">
-              <div className="form-check mt-4">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="bonificableCheck"
-                  checked={resumen.envioBonificado}
-                  disabled
-                />
-                <label className="form-check-label" htmlFor="bonificableCheck">
-                  Bonificable
-                </label>
-              </div>
-            </div>
+<div className="col-md-2">
+  <div className="form-check mt-4">
+    <input
+      type="checkbox"
+      className="form-check-input"
+      id="bonificableCheck"
+      checked={bonificable}              // estado local
+      onChange={(e) => setBonificable(e.target.checked)} // actualiza estado
+    />
+    <label className="form-check-label" htmlFor="bonificableCheck">
+      Bonificable
+    </label>
+  </div>
+</div>
+
 
 
           </div>
