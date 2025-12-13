@@ -1,3 +1,4 @@
+// src/pages/Productos.jsx
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
@@ -23,7 +24,6 @@ const Productos = () => {
   const navigate = useNavigate();
 
   console.log("🔧 API Base configurada:", process.env.REACT_APP_API_BASE);
-
 
   useEffect(() => {
     try {
@@ -53,16 +53,22 @@ const Productos = () => {
 
       if (searchTerm.trim()) {
         console.log('🔍 Buscando productos con término:', searchTerm);
-        res = await axios.get(`/api/productos/buscar/${searchTerm}`, {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-        });
+        res = await axios.get(
+          `${process.env.REACT_APP_API_BASE}/api/productos/buscar/${searchTerm}`,
+          {
+            withCredentials: true,
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          }
+        );
       } else {
         console.log('📦 Cargando todos los productos');
-        res = await axios.get('/api/productos', {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-        });
+        res = await axios.get(
+          `${process.env.REACT_APP_API_BASE}/api/productos`,
+          {
+            withCredentials: true,
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          }
+        );
       }
 
       const data = res.data;
@@ -89,7 +95,6 @@ const Productos = () => {
   useEffect(() => {
     fetchProducts();
   }, [skip, searchTerm]);
-
   const onSiguiente = () => {
     if (skip + limit < total) {
       setSkip(prev => prev + limit);
@@ -129,10 +134,6 @@ const Productos = () => {
         )
         .filter(item => item.quantity > 0)
     );
-  };
-
-  const handleFinalizarCotizacion = () => {
-    navigate('/nuevacotizacion');
   };
 
   const handleRemove = (id) => {
