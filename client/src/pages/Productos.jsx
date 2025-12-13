@@ -1,4 +1,3 @@
-// ...importaciones
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
@@ -8,23 +7,22 @@ import Sidebar from '../components/Sidebar';
 import CardProductos from '../components/CardProductos';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-
-
 const Productos = () => {
   const { usuario } = useUser();
   const [products, setProducts] = useState([]);
   const [skip, setSkip] = useState(0);
   const [total, setTotal] = useState(0);
-  const limit = 12; //establecer limite de productos por pagina
+  const limit = 12; // límite de productos por página
   const [loading, setLoading] = useState(true);
   const currentProducts = products.slice(skip, skip + limit);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [cart, setCart] = useState([]); // Estado para el carrito que guarda los productos seleccionados
+  const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [ocultarCart, setOcultarCart] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {  // Cargar el carrito desde localStorage al montar el componente
+  useEffect(() => {
     try {
       const storedCart = localStorage.getItem('gigaflop_cart');
       if (storedCart) {
@@ -52,20 +50,25 @@ const Productos = () => {
 
       if (searchTerm.trim()) {
         console.log('🔍 Buscando productos con término:', searchTerm);
-        res = await axios.get(`/api/productos/buscar/${searchTerm}`, { withCredentials: true });
+        res = await axios.get(`/api/productos/buscar/${searchTerm}`, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
       } else {
         console.log('📦 Cargando todos los productos');
-        res = await axios.get('/api/productos', { withCredentials: true });
+        res = await axios.get('/api/productos', {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
       }
 
       const data = res.data;
-
       console.log('📥 Respuesta del backend:', data);
 
       const productosNormalizados = (data.productos || []).map(p => ({
         ...p,
         imagen_url: p.image || p.imagen_url || 'default.jpg',
-        _id: p._id || p.id // para asegurar clave única
+        _id: p._id || p.id
       }));
 
       console.log('✅ Productos normalizados:', productosNormalizados);
@@ -79,7 +82,6 @@ const Productos = () => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchProducts();
@@ -95,7 +97,6 @@ const Productos = () => {
     setSkip(prev => Math.max(prev - limit, 0));
   };
 
-  //metodo para agregar productos al carrito se ejecuta al hacer click en el boton agregar al carrito
   const handleAddToCart = (product) => {
     setCart(prevCart => {
       const exists = prevCart.find(item => item.id === product.id);
@@ -130,24 +131,23 @@ const Productos = () => {
   const handleFinalizarCotizacion = () => {
     navigate('/nuevacotizacion');
   };
+
   const handleRemove = (id) => {
     setCart(prevCart => prevCart.filter(item => item.id !== id));
   };
 
-  const [ocultarCart, setOcultarCart] = useState(false);
   const cerrarCartConTransicion = () => {
     setOcultarCart(true);
     setTimeout(() => {
       setShowCart(false);
       setOcultarCart(false);
-    }, 300); // duración de la transición
+    }, 300);
   };
 
   return (
     <>
       <div className="encabezado-fijo">
         <Sidebar />
-
         <div className="background-container-prod">
           <header className="header">
             <div className='container-header'>
@@ -162,32 +162,21 @@ const Productos = () => {
             </div>
           </header>
           <div className="option">
-            {/* Dashboard: admin y gerente */}
             {(usuario?.rol === "administrador" || usuario?.rol === "gerente") && (
               <NavLink className="option-button" to="/dashboard">Dashboard</NavLink>
             )}
-
-            {/* Cotizaciones: todos */}
             <NavLink className="option-button" to="/menu">Cotizaciones</NavLink>
-
-            {/* Clientes y Productos: solo vendedor y admin */}
             {(usuario?.rol === "administrador" || usuario?.rol === "vendedor") && (
               <>
                 <NavLink className="option-button" to="/clientes">Clientes</NavLink>
                 <NavLink className="option-button2" to="/productos">Productos</NavLink>
               </>
             )}
-
-            {/* Configuración: solo admin */}
             {usuario?.rol === "administrador" && (
               <NavLink className="option-button" to="/configuracion">Configuración</NavLink>
             )}
           </div>
         </div>
-
-
-
-
 
         <div className='menu-superior-prod'>
           <div className='cotizatitlecontainer'>
@@ -206,46 +195,35 @@ const Productos = () => {
             />
           </div>
           <div className='container-icon'>
-              <div
-                className="cotizacion-icon-container"
-                title="Tu cotización"
-                onClick={() => setShowCart(!showCart)}
-              >
-                <span ><i className="bi bi-file-earmark-text-fill" style={{fontSize:'7vh', color:'#4285f4'}}></i></span>
-                {cart.length > 0 && (
-                  <span className="cart-badge">
-                    {cart.reduce((acc, item) => acc + item.quantity, 0)}
-                  </span>
-                )}
-              </div>
+            <div
+              className="cotizacion-icon-container"
+              title="Tu cotización"
+              onClick={() => setShowCart(!showCart)}
+            >
+              <span><i className="bi bi-file-earmark-text-fill" style={{ fontSize: '7vh', color: '#4285f4' }}></i></span>
+              {cart.length > 0 && (
+                <span className="cart-badge">
+                  {cart.reduce((acc, item) => acc + item.quantity, 0)}
+                </span>
+              )}
             </div>
-          
-
-            
-
-
-          
+          </div>
         </div>
       </div>
 
-
-
-      <div
-        className={`cart-modal-wrapper  ${showCart ? 'fade-in' : ocultarCart ? 'fade-out'  : 'd-none'
-          }` }
-      >
-        <div className="cart-modal ">
-          <button className="btn-close float-end " onClick={cerrarCartConTransicion}></button>
+      <div className={`cart-modal-wrapper ${showCart ? 'fade-in' : ocultarCart ? 'fade-out' : 'd-none'}`}>
+        <div className="cart-modal">
+          <button className="btn-close float-end" onClick={cerrarCartConTransicion}></button>
           <h5 className="cart-title">🧾 Tu Cotización</h5>
 
           {cart.length === 0 ? (
             <p className="text-muted">No hay productos seleccionados.</p>
           ) : (
             <>
-              <ul className="cart-list ">
+              <ul className="cart-list">
                 {cart.map(item => (
-                  <li key={item.id} className="cart-item ">
-                    <span className="">{item.detalle}</span>
+                  <li key={item.id} className="cart-item">
+                    <span>{item.detalle}</span>
                     <div className="quantity-controls">
                       <button onClick={() => handleDecrement(item.id)}>-</button>
                       <span>{item.quantity}</span>
@@ -255,7 +233,6 @@ const Productos = () => {
                   </li>
                 ))}
               </ul>
-
               <button
                 className="btn btn-success finalizar-btn"
                 onClick={() => navigate('/nuevacotizacion', { state: { carrito: cart } })}
@@ -283,7 +260,6 @@ const Productos = () => {
             <p className="text-center text-danger">{error}</p>
           ) : (
             <>
-
               <div className='productos-box'>
                 {currentProducts.map((item) => (
                   <CardProductos key={item._id} item={item} onAddToCart={handleAddToCart} />
@@ -299,6 +275,9 @@ const Productos = () => {
                   >
                     Anterior
                   </button>
+                  <span className="mx-3">
+                    Página {Math.floor(skip / limit) + 1} de {Math.ceil(total / limit)}
+                  </span>
                   <button
                     className="btn-outline dashbtn"
                     onClick={onSiguiente}

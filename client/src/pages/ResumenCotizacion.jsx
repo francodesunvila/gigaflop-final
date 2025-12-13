@@ -1,7 +1,3 @@
-// ESTO ES LA PAGINA QUE SE ABRE CUANDO FINALIZAMOS UNA COTIZACION Y VEMOS EL RESUMEN 
-//PODEMOS DESCARGAR EL PDF
-//PODEMOS ENVIAR LA COTIZACION AL CLIENTE POR EMAIL + PDF ADJUNTO
-
 import React, { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
@@ -296,12 +292,18 @@ const generarPDFCotizacion = () => {
     try {
       // ✅ Finalizar la cotización si aún no está en estado final
       if (![3, 4].includes(cotizacion.estado?.id)) {
-        await axios.put(
-          `/api/cotizaciones/finalizar/${cotizacion.id_cotizacion}`,
-          cotizacion,
-          { withCredentials: true }
-        );
+  await axios.put(
+    `/api/cotizaciones/finalizar/${cotizacion.id_cotizacion}`,
+    cotizacion,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
       }
+    }
+  );
+}
+
 
       // ✅ Generar HTML y PDF con condiciones comerciales correctas
       const htmlCotizacion = generarHtmlCotizacion();
@@ -323,9 +325,13 @@ const generarPDFCotizacion = () => {
 
       // ✅ Enviar al backend
       await axios.post('/api/email/enviar-con-adjunto', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        withCredentials: true
-      });
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'multipart/form-data',
+    Authorization: `Bearer ${localStorage.getItem("token")}`
+  }
+});
+
 
       // ✅ Actualizar estado visual y mensajes
       setMensajeExito('Cotización enviada al cliente con PDF adjunto');

@@ -61,14 +61,16 @@ const Menu = () => {
       try {
         let res;
         if (usuario.rol === "administrador" || usuario.rol === "gerente") {
-          res = await axios.get("/api/cotizaciones/todas", {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-          });
-        } else {
-          res = await axios.get(`/api/cotizaciones/todas/${usuario.id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-          });
-        }
+  res = await axios.get("/api/cotizaciones/todas", {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    withCredentials: true
+  });
+} else {
+  res = await axios.get(`/api/cotizaciones/todas/${usuario.id}`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    withCredentials: true
+  });
+}
 
         console.log("Cotizaciones recibidas:", res.data);
 

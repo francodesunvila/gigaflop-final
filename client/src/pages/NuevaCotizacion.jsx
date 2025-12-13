@@ -324,17 +324,23 @@ const NuevaCotizacion = () => {
   };
 
   // cargar estados (una sola vez)
-  useEffect(() => {
-    axios.get('/api/estados', { headers: { 'Cache-Control': 'no-cache' } })
-      .then(({ data }) => {
-        // asumimos que devuelve array [{ id, nombre, ... }]
-        setEstados(Array.isArray(data) ? data : (data?.estados || []));
-      })
-      .catch(err => {
-        console.error('Error al cargar estados:', err);
-        setEstados([]);
-      });
-  }, []);
+useEffect(() => {
+  axios.get('/api/estados', {
+    withCredentials: true,
+    headers: {
+      'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+    .then(({ data }) => {
+      setEstados(Array.isArray(data) ? data : (data?.estados || []));
+    })
+    .catch(err => {
+      console.error('Error al cargar estados:', err);
+      setEstados([]);
+    });
+}, []);
+
 
 
 
@@ -399,24 +405,29 @@ const NuevaCotizacion = () => {
 
 
   // Cargar productos disponibles para el buscador (modal)
-  useEffect(() => {
-    axios.get('/api/productos')
-      .then(({ data }) => {
-        console.log('Respuesta completa:', data);
-        if (Array.isArray(data.productos)) {
-          setProductosDisponibles(data.productos);
-        } else {
-          console.error('La respuesta no contiene un array de productos:', data);
-          setProductosDisponibles([]);
-        }
-      })
-      .catch(err => {
-        console.error('Error al cargar productos', err);
+useEffect(() => {
+  axios.get('/api/productos', {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Cache-Control': 'no-cache'
+    }
+  })
+    .then(({ data }) => {
+      console.log('Respuesta completa:', data);
+      if (Array.isArray(data.productos)) {
+        setProductosDisponibles(data.productos);
+      } else {
+        console.error('La respuesta no contiene un array de productos:', data);
         setProductosDisponibles([]);
-      });
+      }
+    })
+    .catch(err => {
+      console.error('Error al cargar productos', err);
+      setProductosDisponibles([]);
+    });
+}, []);
 
-
-  }, []);
 
 
   // Filtrar productos según búsqueda para el modal
@@ -491,25 +502,26 @@ const NuevaCotizacion = () => {
 
 
   // Cargar clientes disponibles (mock)
-  useEffect(() => {
-    const buscarProductos = async () => {
-      try {
-        const res = await axios.get(`/api/productos/buscar-flex?query=${busqueda}`, {
-          headers: { 'Cache-Control': 'no-cache' }
-        });
-        setProductosFiltrados(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        console.error('Error al cargar productos:', err);
-      }
-    };
-
-    if (busqueda.trim().length > 1) {
-      buscarProductos();
+useEffect(() => {
+  const buscarProductos = async () => {
+    try {
+      const res = await axios.get(`/api/productos/buscar-flex?query=${busqueda}`, {
+        withCredentials: true,
+        headers: {
+          'Cache-Control': 'no-cache',
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      setProductosFiltrados(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('Error al cargar productos:', err);
     }
-  }, [busqueda]);
+  };
 
-
-
+  if (busqueda.trim().length > 1) {
+    buscarProductos();
+  }
+}, [busqueda]);
 
 
 
@@ -563,19 +575,24 @@ const NuevaCotizacion = () => {
     const norm = s => String(s ?? '').trim().toLowerCase();
 
     try {
-      const res = await axios.get(`/api/cotizaciones/borrador/retomar/${id}`, {
-        headers: { 'Cache-Control': 'no-cache' }
-      });
-      console.log('Respuesta completa de cotización:', res.data);
-      const { cabecera, productos } = res.data;
+  const res = await axios.get(`/api/cotizaciones/borrador/retomar/${id}`, {
+    withCredentials: true,
+    headers: {
+      'Cache-Control': 'no-cache',
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
 
-      console.log('🧪 productos retomados:', productos);
-      console.log('📦 cabecera completa desde backend:', cabecera);
+  console.log('Respuesta completa de cotización:', res.data);
+  const { cabecera, productos } = res.data;
 
-      if (!cabecera?.id_cliente) {
-        console.error('❌ cabecera.id_cliente está vacío o undefined');
-        return;
-      }
+  console.log('🧪 productos retomados:', productos);
+  console.log('📦 cabecera completa desde backend:', cabecera);
+
+  if (!cabecera?.id_cliente) {
+    console.error('❌ cabecera.id_cliente está vacío o undefined');
+    return;
+  }
 
       // 1) Setear cliente seleccionado (id) temprano
       setClienteSeleccionado(cabecera.id_cliente);
@@ -829,40 +846,71 @@ const NuevaCotizacion = () => {
       // ------------------------------------------------------------
       // Cargar contactos (esperar y manejar fallo sin sobreescribir todo)
       // ------------------------------------------------------------
-      try {
-        const contactosRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/contactos`);
-        const listaContactos = Array.isArray(contactosRes.data) ? contactosRes.data : [];
-        setContactosCliente(listaContactos);
+     try {
+const contactosRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/contactos`, {
+  withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    'Cache-Control': 'no-cache'
+  }
+});
+  const listaContactos = Array.isArray(contactosRes.data) ? contactosRes.data : [];
+  setContactosCliente(listaContactos);
 
-        const contactoEncontrado = listaContactos.find(c => Number(c.id) === Number(cabecera.id_contacto));
-        setContacto(contactoEncontrado?.id || '');
-      } catch (err) {
-        console.error('Error al cargar contactos del cliente', err);
-        setContactosCliente(prev => prev || []);
-        setContacto('');
-      }
+  const contactoEncontrado = listaContactos.find(
+    c => Number(c.id) === Number(cabecera.id_contacto)
+  );
+  setContacto(contactoEncontrado?.id || '');
+} catch (err) {
+  console.error('Error al cargar contactos del cliente', err);
+  setContactosCliente(prev => prev || []);
+  setContacto('');
+}
+
 
       // ------------------------------------------------------------
       // Cargar direcciones y días de pago
       // ------------------------------------------------------------
-      try {
-        const direccionesRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/direcciones`);
-        setDireccionesCliente(Array.isArray(direccionesRes.data) ? direccionesRes.data : []);
-        setDireccionIdSeleccionada(cabecera.id_direccion_cliente || '');
-        console.log('🧪 Dirección retomada:', cabecera.id_direccion_cliente);
-      } catch (err) {
-        console.error('Error al cargar direcciones del cliente', err);
-        setDireccionesCliente(prev => prev || []);
-        setDireccionIdSeleccionada('');
-      }
+     try {
+ const direccionesRes = await axios.get(
+  `/api/clientes/${cabecera.id_cliente}/direcciones`,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Cache-Control': 'no-cache'
+    }
+  }
+);
 
-      try {
-        const diasRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/dias-pago`);
+  setDireccionesCliente(Array.isArray(direccionesRes.data) ? direccionesRes.data : []);
+  setDireccionIdSeleccionada(cabecera.id_direccion_cliente || '');
+  console.log('🧪 Dirección retomada:', cabecera.id_direccion_cliente);
+} catch (err) {
+  console.error('Error al cargar direcciones del cliente', err);
+  setDireccionesCliente(prev => prev || []);
+  setDireccionIdSeleccionada('');
+}
 
-        // Normalizar opciones como strings trimmed, únicos y sin vacíos
-        const opcionesRaw = Array.isArray(diasRes.data) ? diasRes.data : [];
-        const opciones = Array.from(new Set(opcionesRaw.map(x => String(x ?? '').trim()))).filter(x => x !== '');
-        setOpcionesDiasPago(opciones);
+
+    try {
+const diasRes = await axios.get(
+  `/api/clientes/${cabecera.id_cliente}/dias-pago`,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Cache-Control': 'no-cache'
+    }
+  }
+);
+
+  // Normalizar opciones como strings trimmed, únicos y sin vacíos
+  const opcionesRaw = Array.isArray(diasRes.data) ? diasRes.data : [];
+  const opciones = Array.from(
+    new Set(opcionesRaw.map(x => String(x ?? '').trim()))
+  ).filter(x => x !== '');
+  setOpcionesDiasPago(opciones);
 
         // reset flag local (si existe el ref)
         if (typeof diasResueltoRef !== 'undefined' && diasResueltoRef && 'current' in diasResueltoRef) {
@@ -1010,8 +1058,14 @@ const NuevaCotizacion = () => {
         });
         await esperaCondiciones();
 
-        const { data } = await axios.get(`/api/clientes/${clienteSeleccionado}/dias-pago`);
-        if (!mounted) return;
+       const { data } = await axios.get(`/api/clientes/${clienteSeleccionado}/dias-pago`, {
+  withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`
+  }
+});
+
+if (!mounted) return;
 
         // normalizar y guardar opciones
         const opciones = Array.isArray(data)
@@ -1068,15 +1122,20 @@ const NuevaCotizacion = () => {
       }
 
       try {
-        const res = await axios.get(`/api/clientes/buscar/${busquedaCliente}`, {
-          withCredentials: true,
-        });
-        console.log('Respuesta de clientes:', res.data); // ✅
-        setSugerencias(res.data || []);
-      } catch (err) {
-        console.error('Error al buscar clientes:', err);
-        setSugerencias([]);
-      }
+  const res = await axios.get(`/api/clientes/buscar/${busquedaCliente}`, {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+
+  console.log('Respuesta de clientes:', res.data); // ✅
+  setSugerencias(res.data || []);
+} catch (err) {
+  console.error('Error al buscar clientes:', err);
+  setSugerencias([]);
+}
+
     };
 
     const delay = setTimeout(buscarClientes, 300); // debounce
@@ -1088,39 +1147,48 @@ const NuevaCotizacion = () => {
 
 
   // Cargar direcciones del cliente seleccionado
-  useEffect(() => {
-    if (!cliente) return;
+ useEffect(() => {
+  if (!cliente) return;
 
-    axios.get(`/api/clientes/${cliente}/direcciones`)
+  axios.get(`/api/clientes/${cliente}/direcciones`, {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+    .then(({ data }) => {
+      console.log('Direcciones recibidas:', data);
+      setDireccionesCliente(Array.isArray(data) ? data : []);
+    })
+    .catch(err => {
+      console.error('Error al cargar direcciones del cliente', err);
+      setDireccionesCliente([]);
+    });
+}, [cliente]);
 
-
-      .then(({ data }) => {
-        console.log('Direcciones recibidas:', data);
-
-        setDireccionesCliente(Array.isArray(data) ? data : []);
-      })
-      .catch(err => {
-        console.error('Error al cargar direcciones del cliente', err);
-        setDireccionesCliente([]);
-      });
-  }, [cliente]);
 
 
   // Actualizar costo de envío al cambiar dirección o modalidad
   useEffect(() => {
-    if (!direccionIdSeleccionada || modalidadEntrega !== 'Envío') return;
+  if (!direccionIdSeleccionada || modalidadEntrega !== 'Envío') return;
 
-    axios.get(`/api/clientes/envios/costo?id_direccion=${direccionIdSeleccionada}`)
-      .then(({ data }) => {
-        setCostoEnvio(data.costo);
-        setZonaEnvio(data.zona_envio);
-      })
-      .catch(err => {
-        console.error('Error al obtener costo de envío:', err);
-        setCostoEnvio(null);
-        setZonaEnvio('');
-      });
-  }, [direccionIdSeleccionada, modalidadEntrega]);
+  axios.get(`/api/clientes/envios/costo?id_direccion=${direccionIdSeleccionada}`, {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+    .then(({ data }) => {
+      setCostoEnvio(data.costo);
+      setZonaEnvio(data.zona_envio);
+    })
+    .catch(err => {
+      console.error('Error al obtener costo de envío:', err);
+      setCostoEnvio(null);
+      setZonaEnvio('');
+    });
+}, [direccionIdSeleccionada, modalidadEntrega]);
+
 
 
 
@@ -1169,10 +1237,14 @@ useEffect(() => {
 
   // Cargar condiciones comerciales al seleccionar cliente
   const cargarCondiciones = async (idCliente) => {
-    try {
-      const { data } = await axios.get(`/api/clientes/${idCliente}/condiciones`, {
-        headers: { 'Cache-Control': 'no-cache' }
-      });
+  try {
+    const { data } = await axios.get(`/api/clientes/${idCliente}/condiciones`, {
+      withCredentials: true,
+      headers: {
+        'Cache-Control': 'no-cache',
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
 
       // Normalizar la respuesta a un array de condiciones
       let listaCondiciones = [];
@@ -1387,11 +1459,18 @@ useEffect(() => {
 
   //ESTA FUNCION PARA COMPARTIR ❌
   const enviarCotizacionAlCliente = async (payloadEnviar, idCotizacion, token) => {
-    try {
-      const sendResp = await axios.put(`/api/cotizaciones/finalizar/${idCotizacion}`, payloadEnviar, {
+  try {
+    const sendResp = await axios.put(
+      `/api/cotizaciones/finalizar/${idCotizacion}`,
+      payloadEnviar,
+      {
         withCredentials: true,
-        headers: { Authorization: `Bearer ${token}` }
-      });
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache'
+        }
+      }
+    );
 
       return { ok: true, data: sendResp.data };
     } catch (error) {
@@ -1418,8 +1497,14 @@ useEffect(() => {
   // Función para manejar la búsqueda de productos fuera del modal
   const handleBuscar = async () => {
     try {
-      const res = await axios.get(`/api/productos/buscar-flex?query=${query}`);
-      const productos = Array.isArray(res.data) ? res.data : res.data.productos || [];
+  const res = await axios.get(`/api/productos/buscar-flex?query=${query}`, {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+
+  const productos = Array.isArray(res.data) ? res.data : res.data.productos || [];
 
       setProductosFiltrados(productos);
       setPaginaActual(1); // reinicia paginación
@@ -1530,10 +1615,17 @@ useEffect(() => {
 
       // Enviar actualización
       const res = await axios.put(
-        `/api/cotizaciones/${idCotizacionActual}/actualizar`,
-        payload,
-        { withCredentials: true }
-      );
+  `/api/cotizaciones/${idCotizacionActual}/actualizar`,
+  payload,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Cache-Control': 'no-cache'
+    }
+  }
+);
+
 
       // Mensaje y estado
       setMensajeExito('Cotización actualizada correctamente');
@@ -1836,15 +1928,29 @@ observaciones: observacionesFinal,
 
 
       if (idCotizacionActual) {
-        respSave = await axios.put(`/api/cotizaciones/finalizar/${idCotizacionActual}`, payloadBorrador, {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${usuarioActual?.token}` }
-        });
+  respSave = await axios.put(
+    `/api/cotizaciones/finalizar/${idCotizacionActual}`,
+    payloadBorrador,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${usuarioActual?.token}`,
+        'Cache-Control': 'no-cache'
+      }
+    }
+  );
         setIdCotizacionActual(idCotizacionActual);
       } else {
-        respSave = await axios.post('/api/cotizaciones/iniciar', payloadBorrador, { withCredentials: true });
-        const newId = respSave.data?.id_cotizacion ?? respSave.data?.id ?? null;
-        setIdCotizacionActual(newId);
+  respSave = await axios.post('/api/cotizaciones/iniciar', payloadBorrador, {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Cache-Control': 'no-cache'
+    }
+  });
+
+  const newId = respSave.data?.id_cotizacion ?? respSave.data?.id ?? null;
+  setIdCotizacionActual(newId);
         if (newId) localStorage.setItem('idCotizacionActual', newId);
         setNumeroCotizacion(respSave.data?.numero_cotizacion ?? '');
       }
@@ -1884,10 +1990,16 @@ observaciones: observacionesFinal,
       let direccionesClienteFinal = direccionesCliente;
       if ((!direccionesClienteFinal || !direccionesClienteFinal.length) && clienteObjeto?.id) {
         try {
-          const { data } = await axios.get(`/api/clientes/${clienteObjeto.id}/direcciones`);
-          if (Array.isArray(data)) {
-            direccionesClienteFinal = data;
-          }
+  const { data } = await axios.get(`/api/clientes/${clienteObjeto.id}/direcciones`, {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+
+  if (Array.isArray(data)) {
+    direccionesClienteFinal = data;
+  }
         } catch (err) {
           console.error('Error al cargar direcciones del cliente:', err);
         }
@@ -2145,20 +2257,37 @@ const condicionesResumen = {
 
     try {
       if (idCotizacionActual) {
-        const resp = await axios.put(
-          `/api/cotizaciones/${idCotizacionActual}/actualizar`,
-          payload,
-          { withCredentials: true }
-        );
-        setMensajeExito('Cotización actualizada como borrador');
-        setEstadoCotizacion(resp.data?.estado_nombre ?? resp.data?.estado ?? (payload.id_estado ? String(payload.id_estado) : ''));
-        console.log('✅ Borrador actualizado:', idCotizacionActual);
-      } else {
-        const res = await axios.post(
-          '/api/cotizaciones/iniciar',
-          payload,
-          { withCredentials: true }
-        );
+  const resp = await axios.put(
+    `/api/cotizaciones/${idCotizacionActual}/actualizar`,
+    payload,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Cache-Control': 'no-cache'
+      }
+    }
+  );
+
+  setMensajeExito('Cotización actualizada como borrador');
+  setEstadoCotizacion(
+    resp.data?.estado_nombre ??
+    resp.data?.estado ??
+    (payload.id_estado ? String(payload.id_estado) : '')
+  );
+  console.log('✅ Borrador actualizado:', idCotizacionActual);
+} else {
+  const res = await axios.post(
+    '/api/cotizaciones/iniciar',
+    payload,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Cache-Control': 'no-cache'
+      }
+    }
+  );
 
         const idResp = res.data?.id_cotizacion ?? res.data?.id ?? null;
         setIdCotizacionActual(idResp);
@@ -2275,10 +2404,15 @@ const condicionesResumen = {
                           setBusquedaCliente(`${c.razon_social} – CUIT: ${c.cuit}`);
                           setSugerencias([]);
 
-                          axios.get(`/api/clientes/${c.id}/contactos`)
-                            .then(({ data }) => {
-                              const lista = Array.isArray(data) ? data : [];
-                              setContactosCliente(lista);
+                          axios.get(`/api/clientes/${c.id}/contactos`, {
+  withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`
+  }
+})
+  .then(({ data }) => {
+    const lista = Array.isArray(data) ? data : [];
+    setContactosCliente(lista);
 
                               const contactoPreservado = lista.find(ct => ct.id === contacto);
                               setContacto(contactoPreservado?.id || '');

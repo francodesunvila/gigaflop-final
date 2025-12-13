@@ -1,5 +1,3 @@
-
-
 // este archivo define el contexto de usuario para la aplicación React
 import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
@@ -19,7 +17,10 @@ export const UserProvider = ({ children }) => {
     }
 
     axios
-      .get('/api/usuarios/profile', { withCredentials: true })
+      .get('/api/usuarios/profile', {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      })
       .then(res => {
         const usuarioData = res.data.usuario;
 
@@ -49,9 +50,3 @@ export const UserProvider = ({ children }) => {
 };
 
 export const useUser = () => useContext(UserContext);
-
-
-
-
-
-// permite acceder al contexto de usuario en cualquier componente hijo que lo consuma.
