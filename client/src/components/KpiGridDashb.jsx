@@ -1,16 +1,3 @@
-//este componente muestra un grid con los KPIs del dashboard
-//recibe los KPIs como props desde el componente padre Dashboard.jsx
-//y los muestra en tarjetas con tasas y valores formateados en USD.
-//Resultado
-//Card azul (Cotizaciones): muestra el total y el ticket promedio general en USD.
-//Card verde (Aceptadas): muestra el total y la tasa de aceptación %.
-//Card roja (Rechazadas): muestra el total y la tasa de rechazo %.
-//Card amarilla (Pendientes): muestra el total y la tasa de pendientes %.
-//Card gris (Vencidas): muestra el total y la tasa de vencidas %.
-//Así todas tus cards quedan consistentes: cantidad + tasa %, y la azul además con el ticket promedio.
-//todas se calculan a partir de los datos obtenidos en Dashboard.jsx es decir suma de todas las cotizaciones y se divide por el total segun su estado.
-
-
 import React from 'react';
 import '../CSS/dashboard.css';
 
