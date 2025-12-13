@@ -1,4 +1,3 @@
-// src/pages/Productos.jsx
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
@@ -54,20 +53,14 @@ const Productos = () => {
       if (searchTerm.trim()) {
         console.log('🔍 Buscando productos con término:', searchTerm);
         res = await axios.get(
-          `${process.env.REACT_APP_API_BASE}/api/productos/buscar/${searchTerm}`,
-          {
-            withCredentials: true,
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-          }
+          `${process.env.REACT_APP_API_BASE}/api/productos/buscar/${encodeURIComponent(searchTerm)}`,
+          { withCredentials: true }
         );
       } else {
         console.log('📦 Cargando todos los productos');
         res = await axios.get(
           `${process.env.REACT_APP_API_BASE}/api/productos`,
-          {
-            withCredentials: true,
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-          }
+          { withCredentials: true }
         );
       }
 
@@ -95,6 +88,7 @@ const Productos = () => {
   useEffect(() => {
     fetchProducts();
   }, [skip, searchTerm]);
+
   const onSiguiente = () => {
     if (skip + limit < total) {
       setSkip(prev => prev + limit);
@@ -147,7 +141,6 @@ const Productos = () => {
       setOcultarCart(false);
     }, 300);
   };
-
   return (
     <>
       <div className="encabezado-fijo">

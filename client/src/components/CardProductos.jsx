@@ -16,7 +16,7 @@ const CardProductos = ({ item, onAddToCart }) => {
   const imagenSrc = item.image
     ? item.image // URL completa desde Cloudinary
     : item.imagen_url
-      ? `${process.env.REACT_APP_API_BASE}/api/imagen/${encodeURIComponent(item.imagen_url)}`
+      ? `${process.env.REACT_APP_API_BASE}/api/productos/imagen/${encodeURIComponent(item.imagen_url)}`
       : '/images/default.jpg'; // Fallback local
 
   return (

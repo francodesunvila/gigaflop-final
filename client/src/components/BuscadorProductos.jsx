@@ -5,6 +5,7 @@ import axios from 'axios';
 const BuscadorProductos = ({ carrito, setCarrito, query, setQuery, abrirModal }) => {
   const [resultados, setResultados] = useState([]);
   const [mensaje, setMensaje] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const buscar = async () => {
@@ -14,14 +15,16 @@ const BuscadorProductos = ({ carrito, setCarrito, query, setQuery, abrirModal })
         return;
       }
 
+      setLoading(true);
       try {
         const res = await axios.get(
-          `${process.env.REACT_APP_API_BASE}/api/productos/buscar/${query}`,
+          `${process.env.REACT_APP_API_BASE}/api/productos/buscar/${encodeURIComponent(query)}`,
           { withCredentials: true }
         );
+
         const data = res.data;
 
-        if (data.productos.length === 0) {
+        if (!data.productos || data.productos.length === 0) {
           setMensaje('No se encontraron productos con ese término.');
           setResultados([]);
         } else {
@@ -32,6 +35,8 @@ const BuscadorProductos = ({ carrito, setCarrito, query, setQuery, abrirModal })
         console.error('Error al buscar productos:', error);
         setMensaje('Error al buscar productos.');
         setResultados([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -76,6 +81,8 @@ const BuscadorProductos = ({ carrito, setCarrito, query, setQuery, abrirModal })
           <i className="bi bi-x-circle"></i> Limpiar
         </button>
       </div>
+
+      {loading && <div className="text-muted small">Buscando productos...</div>}
 
       {resultados.length > 0 && (
         <div className="text-success small">
