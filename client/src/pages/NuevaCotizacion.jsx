@@ -2172,55 +2172,51 @@ const condicionesResumen = {
 
 
 
-      // ✅ Navegación con resumen completo
-      navigate('/resumen-cotizacion', {
-        state: {
-          cotizacion: {
-            ...payloadBorrador,
-            productos: productosEnriquecidos,
-            cliente: clienteResumen,
-            condiciones: condicionesResumen,   // bloque agrupado
-            forma_pago: condicionesResumen.forma_pago,   // sueltos para compatibilidad
-            dias_pago: condicionesResumen.dias_pago,
-            tipo_cambio: condicionesResumen.tipo_cambio,
-            observaciones: condicionesResumen.observaciones,
-            vigencia_hasta: payloadBorrador.vigencia_hasta || cabecera?.vigencia_hasta || '-',
-            id_cotizacion: idCotizacionActual ?? respSave?.data?.id_cotizacion ?? respSave?.data?.id,
-            numero_cotizacion: numeroCotizacionFinal
-          }
-        }
-      });
-
-
-
-    } catch (error) {
-      console.error('Error al finalizar cotización:', error.response?.data || error.message || error);
-
-      const backendMsg = error.response?.data?.error || error.response?.data?.message || error.message || '';
-      const perProductRegex = /El markup del producto\s+([^\s)]+).*supera el máximo permitido/i;
-
-      if (perProductRegex.test(backendMsg)) {
-        const match = backendMsg.match(/El markup del producto\s+([^\s)]+)/i);
-        const keyRaw = match ? match[1] : null;
-        const key = keyRaw ? String(keyRaw) : null;
-
-        setErroresProductos(prev => ({ ...(prev || {}), ...(key ? { [key]: backendMsg } : {}) }));
-
-        setMensajeError(prev => {
-          const prevCount = Object.keys((prev && typeof prev === 'object') ? prev : {}).length;
-          const total = prevCount + (key ? 1 : 0);
-          return `Hay ${total} producto(s) con valores fuera de rango`;
-        });
-
-        setMensajeExito('');
-      } else {
-        setMensajeError(backendMsg || 'No se pudo finalizar la cotización');
-        setMensajeExito('');
-      }
+     // ✅ Navegación con resumen completo usando id en la URL
+navigate(`/resumen-cotizacion/${idCotizacionActual ?? respSave?.data?.id_cotizacion ?? respSave?.data?.id}`, {
+  state: {
+    cotizacion: {
+      ...payloadBorrador,
+      productos: productosEnriquecidos,
+      cliente: clienteResumen,
+      condiciones: condicionesResumen,   // bloque agrupado
+      forma_pago: condicionesResumen.forma_pago,   // sueltos para compatibilidad
+      dias_pago: condicionesResumen.dias_pago,
+      tipo_cambio: condicionesResumen.tipo_cambio,
+      observaciones: condicionesResumen.observaciones,
+      vigencia_hasta: payloadBorrador.vigencia_hasta || cabecera?.vigencia_hasta || '-',
+      id_cotizacion: idCotizacionActual ?? respSave?.data?.id_cotizacion ?? respSave?.data?.id,
+      numero_cotizacion: numeroCotizacionFinal
     }
+  }
+});
 
+} catch (error) {
+  console.error('Error al finalizar cotización:', error.response?.data || error.message || error);
+
+  const backendMsg = error.response?.data?.error || error.response?.data?.message || error.message || '';
+  const perProductRegex = /El markup del producto\s+([^\s)]+).*supera el máximo permitido/i;
+
+  if (perProductRegex.test(backendMsg)) {
+    const match = backendMsg.match(/El markup del producto\s+([^\s)]+)/i);
+    const keyRaw = match ? match[1] : null;
+    const key = keyRaw ? String(keyRaw) : null;
+
+    setErroresProductos(prev => ({ ...(prev || {}), ...(key ? { [key]: backendMsg } : {}) }));
+
+    setMensajeError(prev => {
+      const prevCount = Object.keys((prev && typeof prev === 'object') ? prev : {}).length;
+      const total = prevCount + (key ? 1 : 0);
+      return `Hay ${total} producto(s) con valores fuera de rango`;
+    });
+
+    setMensajeExito('');
+  } else {
+    setMensajeError(backendMsg || 'No se pudo finalizar la cotización');
+    setMensajeExito('');
+  }
+}
   };
-
 
   // Guardar cotización como borrador
   // Guardar cotización como borrador
