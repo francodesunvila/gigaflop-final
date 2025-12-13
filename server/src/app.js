@@ -1,4 +1,3 @@
-// src/app.js
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
@@ -51,7 +50,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/clientes", clientesRoutes);
 app.use("/api/productos", productosRoutes);
 app.use("/api/cotizaciones", cotizacionRoutes);
-app.use("/api/contactos", contactosRoutes);
+app.use("/api/clientes", contactosRoutes);   // 👈 CORREGIDO: contactos bajo /api/clientes
 app.use("/api/estados", estadosRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/configuracion", configuracionRoutes);

@@ -2,6 +2,7 @@
 export const authorize = (rolesPermitidos = []) => {
   return (req, res, next) => {
     const userRole = req.user?.rol; // viene del token validado en validateToken.js
+    console.log("[roleAuth] rol detectado:", userRole);
 
     // Si no hay rol en el token
     if (!userRole) {

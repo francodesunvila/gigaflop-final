@@ -1,4 +1,3 @@
-// src/routes/contactosRoutes.js
 import { Router } from "express";
 import { authRequired } from "../middlewares/validateToken.js";
 import { authorize } from "../middlewares/roleAuth.js";
@@ -6,9 +5,9 @@ import { obtenerContactosPorClienteController } from "../controllers/contactosCo
 
 const router = Router();
 
-
+// 📌 Ruta para obtener contactos por ID del cliente
 router.get(
-  "/clientes/:id/contactos",
+  "/:id/contactos",   // 👈 CORREGIDO: ahora es relativo a /api/clientes
   authRequired,
   authorize(["administrador", "vendedor"]),
   obtenerContactosPorClienteController
