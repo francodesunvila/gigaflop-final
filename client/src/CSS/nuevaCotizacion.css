@@ -11,6 +11,32 @@
   z-index: 1050;
 }
 
+.form-check{
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15vw;
+}
+
+.checkcontainer{
+
+display: flex;
+align-items: center;
+justify-content: center;
+width: 15vw;
+margin-top: 50px;
+}
+
+
+.bonititle{
+
+
+  margin-left: 80px;
+  margin-right: -65px;
+  
+}
+
 .modal-dialog-custom {
   width: 90%;
   max-width: 1000px;
@@ -152,3 +178,8 @@
   background-color: #f0f0f0;
 }
 
+#bonificableCheck:hover,
+#bonificableCheck:focus {
+  outline: none;
+  box-shadow: none;
+}

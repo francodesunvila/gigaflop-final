@@ -167,9 +167,13 @@ await axios.put(`${process.env.REACT_APP_API_BASE}/api/clientes/direcciones/${cl
   direcciones: clienteAEditar.direcciones || []
 });
 
-// 🟩 Contactos
 await axios.put(`${process.env.REACT_APP_API_BASE}/api/clientes/contactos/${clienteAEditar.cuit}`, {
-  contactos: Array.isArray(clienteAEditar.contactos) ? clienteAEditar.contactos : []
+  contactos: Array.isArray(clienteAEditar.contactos)
+    ? clienteAEditar.contactos.map(c => ({
+        ...c,
+        id: String(c.id) // fuerza consistencia
+      }))
+    : []
 });
 
 // 🟧 Condiciones comerciales nuevas confirmadas

@@ -508,11 +508,23 @@ useEffect(() => {
 
 
 
-  // Contacto seleccionado
-  const contactoSeleccionado = contactosCliente.find(c => c.id === parseInt(contacto));
-  const num = (v) => (isNaN(parseFloat(v)) ? 0 : parseFloat(v));
-  const showGlobalError = (msg) => setErrorGlobal(msg);
-  const showGlobalInfo = (msg) => setInfoGlobal(msg);
+// Asegura que contactosCliente sea un array
+const listaContactos = Array.isArray(contactosCliente) ? contactosCliente : [];
+
+// Normaliza el valor seleccionado
+const contactoIdSel = (contacto === null || contacto === undefined || contacto === '')
+  ? null
+  : Number(contacto);
+
+// Busca solo si hay un id válido
+const contactoSeleccionado = contactoIdSel === null
+  ? null
+  : listaContactos.find(c => Number(c.id) === contactoIdSel);
+
+// Helpers
+const num = (v) => (isNaN(parseFloat(v)) ? 0 : parseFloat(v));
+const showGlobalError = (msg) => setErrorGlobal(msg);
+const showGlobalInfo = (msg) => setInfoGlobal(msg);
 
 
 // Cargar clientes disponibles (mock)
@@ -2397,6 +2409,9 @@ const resp = await axios.put(
     }
   };
 
+console.log('contactosCliente:', contactosCliente);
+console.log('typeof ids:', contactosCliente.map(c => typeof c.id));
+console.log('contacto state:', contacto, typeof contacto);
 
 
 
@@ -2475,43 +2490,47 @@ const resp = await axios.put(
         )
   .then(({ data }) => {
     const lista = Array.isArray(data) ? data : [];
-    setContactosCliente(lista);
+   setContactosCliente(lista);
 
-                              const contactoPreservado = lista.find(ct => ct.id === contacto);
-                              setContacto(contactoPreservado?.id || '');
-                            })
-                            .catch(err => {
-                              console.error('Error al cargar contactos del cliente', err);
-                              setContactosCliente([]);
-                              setContacto('');
-                            });
-                        }}
-                      >
-                        {c.razon_social} – CUIT: {c.cuit}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+const contactoPreservado = lista.find(
+  ct => String(ct.id) === String(contacto)
+);
+setContacto(contactoPreservado?.id || '');
+})
+.catch(err => {
+  console.error('Error al cargar contactos del cliente', err);
+  setContactosCliente([]);
+  setContacto('');
+});
+}}
+>
+  {c.razon_social} – CUIT: {c.cuit}
+</li>
+))}
+</ul>
+)}
+</div>
 
 
               {/* Contacto */}
-              <div className="col-md-6">
-                <label className="form-label">Contacto<span style={{ color: 'red' }}>*</span></label>
-                <select
-                  className="form-select"
-                  value={contacto}
-                  onChange={(e) => setContacto(e.target.value)}
-                  disabled={contactosCliente.length === 0}
-                >
-                  <option value="">Seleccionar contacto...</option>
-                  {contactosCliente.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.nombre_contacto} {c.apellido}
-                    </option>
-                  ))}
-                </select>
-              </div>
+<div className="col-md-6">
+  <label className="form-label">
+    Contacto<span style={{ color: 'red' }}>*</span>
+  </label>
+  <select
+    className="form-select"
+    value={contacto}
+    onChange={(e) => setContacto(e.target.value)}
+    disabled={contactosCliente.length === 0}
+  >
+    <option value="">Seleccionar contacto...</option>
+    {contactosCliente.map(c => (
+      <option key={c.id} value={c.id}>
+        {c.nombre_contacto} {c.apellido}
+      </option>
+    ))}
+  </select>
+</div>
 
             </div>
           </div>
@@ -2580,21 +2599,30 @@ const resp = await axios.put(
 
 
 
-            {/* Bonificable */}
-<div className="col-md-2">
-  <div className="form-check mt-4">
-    <input
-      type="checkbox"
-      className="form-check-input"
-      id="bonificableCheck"
-      checked={bonificable}              // estado local
-      onChange={(e) => setBonificable(e.target.checked)} // actualiza estado
-    />
-    <label className="form-check-label" htmlFor="bonificableCheck">
+{/* Bonificable */}
+<div className="col-md-2 d-flex align-items-center checkcontainer">
+  <div className="form-check ">
+    <label className="form-check-label bonititle" htmlFor="bonificableCheck">
       Bonificable
     </label>
+    <input
+      type="checkbox"
+      id="bonificableCheck"
+      checked={bonificable}
+      className=" checkblue"
+      onChange={(e) => setBonificable(e.target.checked)}
+      style={{
+        width: '50%',
+        height: '18px',
+        borderRadius: '0',   // cuadrado perfecto
+        accentColor: '#4285f4' // color azul Bootstrap
+      }}
+    />
+    
   </div>
 </div>
+
+
 
 
 
