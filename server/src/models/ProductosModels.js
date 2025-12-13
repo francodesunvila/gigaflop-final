@@ -80,11 +80,34 @@ export const obtenerProductosDesdeRemoto = async () => {
   const [rows] = await dbRemota.query('SELECT * FROM productos');
   return rows;
 };
-
-
 ///  Función de búsqueda de productos por texto libre
 export const buscarProductosPorTextoLibre = async (valor) => {
-  const texto = valor.toLowerCase();
+  const texto = (valor ?? '').toString().trim().toLowerCase();
+
+  // Si el texto está vacío, podés devolver todos los productos (como tu UX actual sugiere)
+  if (!texto) {
+    const [rows] = await pool.query(`
+      SELECT 
+        p.id,
+        p.part_number,
+        p.detalle,
+        p.categoria,
+        p.subcategoria,
+        p.marca,
+        p.stock,
+        p.precio,
+        p.tasa_iva,
+        p.ultima_actualizacion,
+        p.id_proveedor,
+        i.imagen_url
+      FROM productos p
+      LEFT JOIN imagenes_productos i 
+        ON i.id_producto = p.id AND i.es_principal = 1
+    `);
+    return rows;
+  }
+
+  const like = `%${texto}%`;
 
   const [productos] = await pool.query(`
     SELECT 
@@ -103,19 +126,15 @@ export const buscarProductosPorTextoLibre = async (valor) => {
     FROM productos p
     LEFT JOIN imagenes_productos i 
       ON i.id_producto = p.id AND i.es_principal = 1
-    WHERE LOWER(p.detalle) LIKE ? OR
-          LOWER(p.part_number) LIKE ? OR
-          LOWER(p.categoria) LIKE ? OR
-          LOWER(p.subcategoria) LIKE ? OR
-          LOWER(p.marca) LIKE ? OR
-          CAST(p.stock AS CHAR) LIKE ? OR
-          CAST(p.precio AS CHAR) LIKE ? OR
-          CAST(p.tasa_iva AS CHAR) LIKE ?
-  `, Array(8).fill(`%${texto}%`));
+    WHERE LOWER(TRIM(p.detalle))      LIKE ?
+       OR LOWER(TRIM(p.part_number))  LIKE ?
+       OR LOWER(TRIM(p.categoria))    LIKE ?
+       OR LOWER(TRIM(p.subcategoria)) LIKE ?
+       OR LOWER(TRIM(p.marca))        LIKE ?
+  `, [like, like, like, like, like]);
 
   return productos;
 };
-
 ///  Función para obtener productos junto con su imagen principal
 export const obtenerProductosConImagen = async () => {
   const [rows] = await pool.query(`

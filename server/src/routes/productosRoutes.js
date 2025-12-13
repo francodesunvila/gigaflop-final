@@ -13,8 +13,11 @@ router.get("/buscar/columna/:columna/:valor", productosController.obtenerProduct
 // 📌 Listar todos los productos
 router.get("/", productosController.listarTodosLosProductos);
 
-// 📌 Buscar por texto libre
+// 📌 Buscar por texto libre (ruta original)
 router.get("/buscar/texto/:valor", productosController.buscarProductos);
+
+// 📌 Buscar por texto libre (ruta corta para frontend)
+router.get("/buscar/:valor", productosController.buscarProductos);
 
 // 📌 Sincronizar productos desde API externa
 router.get("/sincronizar", productosController.sincronizarProductos);
