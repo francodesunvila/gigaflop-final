@@ -19,26 +19,22 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Configuración de CORS para permitir cookies cross-site
+// ✅ Configuración de CORS para cookies cross-site
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://gigaflop.vercel.app"
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://gigaflop.vercel.app"
-    ],
-    credentials: true
-  })
-);
-
-// ✅ Preflight para todas las rutas
-app.options(
-  "*",
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "https://gigaflop.vercel.app"
-    ],
-    credentials: true
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origen no permitido por CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 

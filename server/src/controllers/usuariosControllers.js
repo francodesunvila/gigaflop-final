@@ -54,16 +54,16 @@ export const login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    // Guardar token en cookie (único mecanismo de auth)
-    // ⚠️ Configuración para desarrollo local (HTTP, localhost)
+    // ⚙️ Configuración de cookie según entorno
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,   // 👈 en local debe ser false
-      sameSite: "lax", // 👈 más permisivo en dev
+      secure: isProduction,              // 👈 en producción true (HTTPS), en local false
+      sameSite: isProduction ? "none" : "lax", // 👈 en producción none, en local lax
       maxAge: 86400000,
     });
 
-    // 👉 No devolvemos el token en el JSON, solo el usuario
     res.status(200).json({
       message: "Inicio de sesión exitoso",
       usuario: {

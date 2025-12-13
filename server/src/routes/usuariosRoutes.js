@@ -1,6 +1,6 @@
 // src/routes/usuariosRoutes.js
 import { Router } from "express";
-import { login, register, logout, profile, checkAuth } from "../controllers/usuariosControllers.js";
+import { login, register, logout, profile, checkAuth } from "../controllers/usuariosController.js"; // 👈 singular
 import { authRequired } from "../middlewares/validateToken.js";
 
 const router = Router();
