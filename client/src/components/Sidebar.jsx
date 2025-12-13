@@ -1,27 +1,31 @@
+// src/components/Sidebar.jsx
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../CSS/menu.css';
 
 const Sidebar = () => {
-  const { usuario, setUsuario, cargando } = useUser(); // hook para acceder al contexto
+  const { usuario, setUsuario, cargando } = useUser();
   const navigate = useNavigate();
 
   if (cargando) return null;
 
   const handleLogout = async () => {
     try {
-      await axios.post('/api/usuarios/logout', null, { withCredentials: true });
-      setUsuario(null); // limpia el contexto
+      await axios.post(
+        `${process.env.REACT_APP_API_BASE}/api/usuarios/logout`,
+        null,
+        { withCredentials: true }
+      );
+      setUsuario(null);
       navigate('/');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }
   };
 
-  // función para asignar color según rol
   const getRolColor = (rol) => {
     switch (rol) {
       case "administrador":
@@ -41,15 +45,14 @@ const Sidebar = () => {
       <div className="container-menu">
         <div className="cont-menu">
           <nav className="text-center mb-3">
-          <div className="usuario-sidebar">
-            <h5 className=" nombre-sidebar">
-              {usuario?.nombre}
-            </h5>
-            <span className={`badge ${getRolColor(usuario?.rol)} rol-badge`}>
-              {usuario?.rol}
-            </span>
-          </div>
-            
+            <div className="usuario-sidebar">
+              <h5 className="nombre-sidebar">
+                {usuario?.nombre}
+              </h5>
+              <span className={`badge ${getRolColor(usuario?.rol)} rol-badge`}>
+                {usuario?.rol}
+              </span>
+            </div>
             <a href="#" onClick={handleLogout}>Cerrar Sesión</a>
           </nav>
           <label htmlFor="btn-menu">

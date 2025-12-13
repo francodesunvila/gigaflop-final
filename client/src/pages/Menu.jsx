@@ -1,3 +1,4 @@
+// src/pages/Menu.jsx
 import axios from 'axios';
 import { NavLink, useNavigate } from 'react-router-dom';
 import '../CSS/menu.css';
@@ -8,10 +9,10 @@ import { useUser } from '../context/UserContext';
 import EtiquetaEstado from '../components/ui/EtiquetaEstado';
 import ModalVistaPreviaCot from '../components/ModalVistaPreviaCot.jsx';
 
-
 const Menu = () => {
   const { usuario, cargando } = useUser();
   const navigate = useNavigate();
+
   const [cotizaciones, setCotizaciones] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletedCotizacion, setDeletedCotizacion] = useState(null);
@@ -19,6 +20,7 @@ const Menu = () => {
   const [alertasEnviadas, setAlertasEnviadas] = useState(new Set());
   const [modalVisible, setModalVisible] = useState(false);
   const [cotizacionSeleccionada, setCotizacionSeleccionada] = useState(null);
+
   const [skip, setSkip] = useState(0);
   const limit = 10; // cantidad de cotizaciones por página
   const [total, setTotal] = useState(0);
@@ -29,7 +31,10 @@ const Menu = () => {
 
   const abrirVistaPrevia = async (cotizacion) => {
     try {
-      const res = await axios.get(`/api/cotizaciones/ver/${cotizacion.id}`);
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_BASE}/api/cotizaciones/ver/${cotizacion.id}`,
+        { withCredentials: true }
+      );
       const cotizacionCompleta = res.data;
 
       const vigencia = cotizacionCompleta.vigencia_hasta
@@ -61,16 +66,22 @@ const Menu = () => {
       try {
         let res;
         if (usuario.rol === "administrador" || usuario.rol === "gerente") {
-  res = await axios.get("/api/cotizaciones/todas", {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    withCredentials: true
-  });
-} else {
-  res = await axios.get(`/api/cotizaciones/todas/${usuario.id}`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    withCredentials: true
-  });
-}
+          res = await axios.get(
+            `${process.env.REACT_APP_API_BASE}/api/cotizaciones/todas`,
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+              withCredentials: true
+            }
+          );
+        } else {
+          res = await axios.get(
+            `${process.env.REACT_APP_API_BASE}/api/cotizaciones/todas/${usuario.id}`,
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+              withCredentials: true
+            }
+          );
+        }
 
         console.log("Cotizaciones recibidas:", res.data);
 
@@ -91,8 +102,9 @@ const Menu = () => {
           contacto: c.contacto_nombre && c.contacto_apellido
             ? `${c.contacto_nombre} ${c.contacto_apellido}`
             : "—",
-          total: Number(c.total || 0).toFixed(2) // 👈 usamos directamente el total del backend
+          total: Number(c.total || 0).toFixed(2)
         }));
+
         setCotizaciones(transformadas);
       } catch (error) {
         console.error("Error al cargar cotizaciones:", error);
@@ -128,7 +140,7 @@ const Menu = () => {
   async function enviarAlertaVencimiento(cotizacion) {
     try {
       await axios.post(
-        `/api/cotizaciones/alerta-vencimiento/${cotizacion.id}`,
+        `${process.env.REACT_APP_API_BASE}/api/cotizaciones/alerta-vencimiento/${cotizacion.id}`,
         {},
         { withCredentials: true }
       );
@@ -144,7 +156,7 @@ const Menu = () => {
   async function manejarCambioDeEstado(id, nuevoEstado) {
     try {
       const res = await axios.put(
-        `/api/cotizaciones/estado/${id}`,
+        `${process.env.REACT_APP_API_BASE}/api/cotizaciones/estado/${id}`,
         { nuevoEstado },
         { withCredentials: true }
       );
@@ -160,8 +172,8 @@ const Menu = () => {
       console.error(`Error al marcar como ${nuevoEstado}:`, error);
     }
   }
-
   const safeToLower = v => String(v ?? '').toLowerCase();
+
   const filteredCotizaciones = cotizaciones.filter(cotizacion => {
     const term = safeToLower(searchTerm);
     const estadoId = cotizacion.estado?.id;
@@ -203,15 +215,12 @@ const Menu = () => {
 
   useEffect(() => {
     setTotal(filteredCotizaciones.length);
-    // 👇 solo resetea si el skip está fuera de rango
     if (skip >= filteredCotizaciones.length) {
       setSkip(0);
     }
   }, [filteredCotizaciones, skip]);
 
   if (cargando) return <p className="text-center mt-5">Cargando usuario...</p>;
-
-
 
   return (
     <>
@@ -229,37 +238,22 @@ const Menu = () => {
             </div>
           </header>
 
-
           <div className="option">
-            {/* Dashboard: admin y gerente */}
             {(usuario?.rol === "administrador" || usuario?.rol === "gerente") && (
               <NavLink className="option-button" to="/dashboard">Dashboard</NavLink>
             )}
-
-
-            {/* Cotizaciones: todos */}
             <NavLink className="option-button2" to="/menu">Cotizaciones</NavLink>
-
-            {/* Clientes y Productos: solo vendedor y admin */}
             {(usuario?.rol === "administrador" || usuario?.rol === "vendedor") && (
               <>
                 <NavLink className="option-button" to="/clientes">Clientes</NavLink>
                 <NavLink className="option-button" to="/productos">Productos</NavLink>
               </>
             )}
-
-
-            {/* Configuración: solo admin */}
             {usuario?.rol === "administrador" && (
               <NavLink className="option-button" to="/configuracion">Configuración</NavLink>
             )}
           </div>
-
         </div>
-
-
-
-
 
         <div className='menu-superior'>
           <div className='cotizatitlecontainer'>
@@ -274,7 +268,6 @@ const Menu = () => {
               onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
           <div className='botonescontainer'>
-
             <button
               className='nc'
               onClick={() => {
@@ -414,7 +407,6 @@ const Menu = () => {
                           </ul>
                         </div>
                       </td>
-
                     </tr>
                   );
                 })}
@@ -444,22 +436,13 @@ const Menu = () => {
         </div>
       </div>
 
-
-
       <ModalVistaPreviaCot
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         cotizacion={cotizacionSeleccionada}
       />
-
-
-
     </>
   );
 };
 
-
-
-
 export default Menu;
-

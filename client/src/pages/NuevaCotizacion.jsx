@@ -325,7 +325,7 @@ const NuevaCotizacion = () => {
 
   // cargar estados (una sola vez)
 useEffect(() => {
-  axios.get('/api/estados', {
+  axios.get(`${process.env.REACT_APP_API_BASE}/api/estados`, {
     withCredentials: true,
     headers: {
       'Cache-Control': 'no-cache',
@@ -406,7 +406,7 @@ useEffect(() => {
 
   // Cargar productos disponibles para el buscador (modal)
 useEffect(() => {
-  axios.get('/api/productos', {
+  axios.get(`${process.env.REACT_APP_API_BASE}/api/productos`, {
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -501,17 +501,20 @@ useEffect(() => {
   const showGlobalInfo = (msg) => setInfoGlobal(msg);
 
 
-  // Cargar clientes disponibles (mock)
+// Cargar clientes disponibles (mock)
 useEffect(() => {
   const buscarProductos = async () => {
     try {
-      const res = await axios.get(`/api/productos/buscar-flex?query=${busqueda}`, {
-        withCredentials: true,
-        headers: {
-          'Cache-Control': 'no-cache',
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_BASE}/api/productos/buscar-flex?query=${busqueda}`,
+        {
+          withCredentials: true,
+          headers: {
+            'Cache-Control': 'no-cache',
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
         }
-      });
+      );
       setProductosFiltrados(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Error al cargar productos:', err);
@@ -574,14 +577,18 @@ useEffect(() => {
     const normalizarNumero = v => (v === null || v === undefined || v === '' ? null : Number(v));
     const norm = s => String(s ?? '').trim().toLowerCase();
 
-    try {
-  const res = await axios.get(`/api/cotizaciones/borrador/retomar/${id}`, {
-    withCredentials: true,
-    headers: {
-      'Cache-Control': 'no-cache',
-      Authorization: `Bearer ${localStorage.getItem("token")}`
+ try {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/cotizaciones/borrador/retomar/${id}`,
+    {
+      withCredentials: true,
+      headers: {
+        'Cache-Control': 'no-cache',
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     }
-  });
+  );
+
 
   console.log('Respuesta completa de cotización:', res.data);
   const { cabecera, productos } = res.data;
@@ -846,14 +853,18 @@ useEffect(() => {
       // ------------------------------------------------------------
       // Cargar contactos (esperar y manejar fallo sin sobreescribir todo)
       // ------------------------------------------------------------
-     try {
-const contactosRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/contactos`, {
-  withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-    'Cache-Control': 'no-cache'
-  }
-});
+try {
+  const contactosRes = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/${cabecera.id_cliente}/contactos`,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Cache-Control': 'no-cache'
+      }
+    }
+  );
+
   const listaContactos = Array.isArray(contactosRes.data) ? contactosRes.data : [];
   setContactosCliente(listaContactos);
 
@@ -871,17 +882,18 @@ const contactosRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/conta
       // ------------------------------------------------------------
       // Cargar direcciones y días de pago
       // ------------------------------------------------------------
-     try {
- const direccionesRes = await axios.get(
-  `/api/clientes/${cabecera.id_cliente}/direcciones`,
-  {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-      'Cache-Control': 'no-cache'
+try {
+  const direccionesRes = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/${cabecera.id_cliente}/direcciones`,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Cache-Control': 'no-cache'
+      }
     }
-  }
-);
+  );
+
 
   setDireccionesCliente(Array.isArray(direccionesRes.data) ? direccionesRes.data : []);
   setDireccionIdSeleccionada(cabecera.id_direccion_cliente || '');
@@ -893,17 +905,18 @@ const contactosRes = await axios.get(`/api/clientes/${cabecera.id_cliente}/conta
 }
 
 
-    try {
-const diasRes = await axios.get(
-  `/api/clientes/${cabecera.id_cliente}/dias-pago`,
-  {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-      'Cache-Control': 'no-cache'
+try {
+  const diasRes = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/${cabecera.id_cliente}/dias-pago`,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Cache-Control': 'no-cache'
+      }
     }
-  }
-);
+  );
+
 
   // Normalizar opciones como strings trimmed, únicos y sin vacíos
   const opcionesRaw = Array.isArray(diasRes.data) ? diasRes.data : [];
@@ -1058,12 +1071,15 @@ const diasRes = await axios.get(
         });
         await esperaCondiciones();
 
-       const { data } = await axios.get(`/api/clientes/${clienteSeleccionado}/dias-pago`, {
-  withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`
+  const { data } = await axios.get(
+  `${process.env.REACT_APP_API_BASE}/api/clientes/${clienteSeleccionado}/dias-pago`,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
   }
-});
+);
 
 if (!mounted) return;
 
@@ -1121,13 +1137,17 @@ if (!mounted) return;
         return;
       }
 
-      try {
-  const res = await axios.get(`/api/clientes/buscar/${busquedaCliente}`, {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
+try {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/buscar/${busquedaCliente}`,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     }
-  });
+  );
+
 
   console.log('Respuesta de clientes:', res.data); // ✅
   setSugerencias(res.data || []);
@@ -1150,10 +1170,12 @@ if (!mounted) return;
  useEffect(() => {
   if (!cliente) return;
 
-  axios.get(`/api/clientes/${cliente}/direcciones`, {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
+  axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/${cliente}/direcciones`,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
     }
   })
     .then(({ data }) => {
@@ -1172,12 +1194,16 @@ if (!mounted) return;
   useEffect(() => {
   if (!direccionIdSeleccionada || modalidadEntrega !== 'Envío') return;
 
-  axios.get(`/api/clientes/envios/costo?id_direccion=${direccionIdSeleccionada}`, {
+ axios.get(
+  `${process.env.REACT_APP_API_BASE}/api/clientes/envios/costo?id_direccion=${direccionIdSeleccionada}`,
+  {
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
     }
-  })
+  }
+)
+
     .then(({ data }) => {
       setCostoEnvio(data.costo);
       setZonaEnvio(data.zona_envio);
@@ -1237,14 +1263,18 @@ useEffect(() => {
 
   // Cargar condiciones comerciales al seleccionar cliente
   const cargarCondiciones = async (idCliente) => {
-  try {
-    const { data } = await axios.get(`/api/clientes/${idCliente}/condiciones`, {
+ try {
+  const { data } = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/${idCliente}/condiciones`,
+    {
       withCredentials: true,
       headers: {
         'Cache-Control': 'no-cache',
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }
-    });
+    }
+  );
+
 
       // Normalizar la respuesta a un array de condiciones
       let listaCondiciones = [];
@@ -1457,11 +1487,11 @@ useEffect(() => {
 
 
 
-  //ESTA FUNCION PARA COMPARTIR ❌
-  const enviarCotizacionAlCliente = async (payloadEnviar, idCotizacion, token) => {
+// ESTA FUNCION PARA COMPARTIR ❌
+const enviarCotizacionAlCliente = async (payloadEnviar, idCotizacion, token) => {
   try {
     const sendResp = await axios.put(
-      `/api/cotizaciones/finalizar/${idCotizacion}`,
+      `${process.env.REACT_APP_API_BASE}/api/cotizaciones/finalizar/${idCotizacion}`,
       payloadEnviar,
       {
         withCredentials: true,
@@ -1471,6 +1501,7 @@ useEffect(() => {
         }
       }
     );
+
 
       return { ok: true, data: sendResp.data };
     } catch (error) {
@@ -1495,14 +1526,17 @@ useEffect(() => {
   //son funciones que manejan eventos específicos en la interfaz de usuario.
 
   // Función para manejar la búsqueda de productos fuera del modal
-  const handleBuscar = async () => {
-    try {
-  const res = await axios.get(`/api/productos/buscar-flex?query=${query}`, {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
-  });
+ const handleBuscar = async () => {
+  try {
+    const res = await axios.get(
+      `${process.env.REACT_APP_API_BASE}/api/productos/buscar-flex?query=${query}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    );
 
   const productos = Array.isArray(res.data) ? res.data : res.data.productos || [];
 
@@ -1614,8 +1648,8 @@ useEffect(() => {
       }
 
       // Enviar actualización
-      const res = await axios.put(
-  `/api/cotizaciones/${idCotizacionActual}/actualizar`,
+   const res = await axios.put(
+  `${process.env.REACT_APP_API_BASE}/api/cotizaciones/${idCotizacionActual}/actualizar`,
   payload,
   {
     withCredentials: true,
@@ -1625,6 +1659,7 @@ useEffect(() => {
     }
   }
 );
+
 
 
       // Mensaje y estado
@@ -1927,9 +1962,9 @@ observaciones: observacionesFinal,
       let respSave;
 
 
-      if (idCotizacionActual) {
+if (idCotizacionActual) {
   respSave = await axios.put(
-    `/api/cotizaciones/finalizar/${idCotizacionActual}`,
+    `${process.env.REACT_APP_API_BASE}/api/cotizaciones/finalizar/${idCotizacionActual}`,
     payloadBorrador,
     {
       withCredentials: true,
@@ -1941,13 +1976,18 @@ observaciones: observacionesFinal,
   );
         setIdCotizacionActual(idCotizacionActual);
       } else {
-  respSave = await axios.post('/api/cotizaciones/iniciar', payloadBorrador, {
+  respSave = await axios.post(
+  `${process.env.REACT_APP_API_BASE}/api/cotizaciones/iniciar`,
+  payloadBorrador,
+  {
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
       'Cache-Control': 'no-cache'
     }
-  });
+  }
+);
+
 
   const newId = respSave.data?.id_cotizacion ?? respSave.data?.id ?? null;
   setIdCotizacionActual(newId);
@@ -1990,12 +2030,16 @@ observaciones: observacionesFinal,
       let direccionesClienteFinal = direccionesCliente;
       if ((!direccionesClienteFinal || !direccionesClienteFinal.length) && clienteObjeto?.id) {
         try {
-  const { data } = await axios.get(`/api/clientes/${clienteObjeto.id}/direcciones`, {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
+  const { data } = await axios.get(
+    `${process.env.REACT_APP_API_BASE}/api/clientes/${clienteObjeto.id}/direcciones`,
+    {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     }
-  });
+  );
+
 
   if (Array.isArray(data)) {
     direccionesClienteFinal = data;
@@ -2257,17 +2301,18 @@ const condicionesResumen = {
 
     try {
       if (idCotizacionActual) {
-  const resp = await axios.put(
-    `/api/cotizaciones/${idCotizacionActual}/actualizar`,
-    payload,
-    {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        'Cache-Control': 'no-cache'
-      }
+const resp = await axios.put(
+  `${process.env.REACT_APP_API_BASE}/api/cotizaciones/${idCotizacionActual}/actualizar`,
+  payload,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Cache-Control': 'no-cache'
     }
-  );
+  }
+);
+
 
   setMensajeExito('Cotización actualizada como borrador');
   setEstadoCotizacion(
@@ -2278,7 +2323,7 @@ const condicionesResumen = {
   console.log('✅ Borrador actualizado:', idCotizacionActual);
 } else {
   const res = await axios.post(
-    '/api/cotizaciones/iniciar',
+    `${process.env.REACT_APP_API_BASE}/api/cotizaciones/iniciar`,
     payload,
     {
       withCredentials: true,
@@ -2288,6 +2333,7 @@ const condicionesResumen = {
       }
     }
   );
+
 
         const idResp = res.data?.id_cotizacion ?? res.data?.id ?? null;
         setIdCotizacionActual(idResp);
@@ -2393,23 +2439,26 @@ const condicionesResumen = {
 
                 {!clienteObjeto && sugerencias.length > 0 && (
                   <ul className="sugerencias-lista">
-                    {sugerencias.map((c) => (
-                      <li
-                        key={c.id}
-                        className="sugerencia-item"
-                        onClick={() => {
-                          setClienteSeleccionado(c.id);
-                          setCliente(c.id);
-                          setClienteObjeto(c);
-                          setBusquedaCliente(`${c.razon_social} – CUIT: ${c.cuit}`);
-                          setSugerencias([]);
+  {sugerencias.map((c) => (
+    <li
+      key={c.id}
+      className="sugerencia-item"
+      onClick={() => {
+        setClienteSeleccionado(c.id);
+        setCliente(c.id);
+        setClienteObjeto(c);
+        setBusquedaCliente(`${c.razon_social} – CUIT: ${c.cuit}`);
+        setSugerencias([]);
 
-                          axios.get(`/api/clientes/${c.id}/contactos`, {
-  withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`
-  }
-})
+        axios.get(
+          `${process.env.REACT_APP_API_BASE}/api/clientes/${c.id}/contactos`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          }
+        )
   .then(({ data }) => {
     const lista = Array.isArray(data) ? data : [];
     setContactosCliente(lista);

@@ -1,7 +1,4 @@
-//este componente maneja el formulario de registro de usuario
-//en configuracion.jsx tenemos el boton registrar usuario que abre un modal con este formulario
-
-
+// src/components/RegisterUser.jsx
 import React, { useState } from "react";
 
 const RegisterUser = ({ onSubmit }) => {
@@ -25,7 +22,6 @@ const RegisterUser = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validación: todos los campos obligatorios deben estar completos
     if (
       !formData.usuario ||
       !formData.password ||
@@ -38,13 +34,22 @@ const RegisterUser = ({ onSubmit }) => {
       return;
     }
 
-    setError(""); // limpiamos error si todo está bien
+    setError("");
     onSubmit(formData);
+
+    // Opcional: limpiar formulario después de enviar
+    setFormData({
+      usuario: "",
+      password: "",
+      email: "",
+      rol: "",
+      nombre: "",
+      apellido: "",
+      estado: "Activo"
+    });
   };
 
   return (
-
-    
     <form id="registerUserForm" onSubmit={handleSubmit}>
       {error && (
         <div className="alert alert-danger mb-3" role="alert">
@@ -57,32 +62,56 @@ const RegisterUser = ({ onSubmit }) => {
           <label htmlFor="usuario" className="form-label">
             Usuario <span className="text-danger">*</span>
           </label>
-          <input id="usuario" type="text" className="form-control"
-            value={formData.usuario} onChange={handleChange} />
+          <input
+            id="usuario"
+            type="text"
+            className="form-control"
+            value={formData.usuario}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div className="col-md-6">
           <label htmlFor="password" className="form-label">
             Contraseña <span className="text-danger">*</span>
           </label>
-          <input id="password" type="password" className="form-control"
-            value={formData.password} onChange={handleChange} />
+          <input
+            id="password"
+            type="password"
+            className="form-control"
+            value={formData.password}
+            onChange={handleChange}
+            autoComplete="new-password"
+            required
+          />
         </div>
 
         <div className="col-md-6">
           <label htmlFor="email" className="form-label">
             E-mail <span className="text-danger">*</span>
           </label>
-          <input id="email" type="email" className="form-control"
-            value={formData.email} onChange={handleChange} />
+          <input
+            id="email"
+            type="email"
+            className="form-control"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div className="col-md-6">
           <label htmlFor="rol" className="form-label">
             Rol <span className="text-danger">*</span>
           </label>
-          <select id="rol" className="form-select"
-            value={formData.rol} onChange={handleChange}>
+          <select
+            id="rol"
+            className="form-select"
+            value={formData.rol}
+            onChange={handleChange}
+            required
+          >
             <option value="">Seleccionar...</option>
             <option value="vendedor">Vendedor</option>
             <option value="gerente">Gerente</option>
@@ -94,16 +123,28 @@ const RegisterUser = ({ onSubmit }) => {
           <label htmlFor="nombre" className="form-label">
             Nombre <span className="text-danger">*</span>
           </label>
-          <input id="nombre" type="text" className="form-control"
-            value={formData.nombre} onChange={handleChange} />
+          <input
+            id="nombre"
+            type="text"
+            className="form-control"
+            value={formData.nombre}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div className="col-md-6">
           <label htmlFor="apellido" className="form-label">
             Apellido <span className="text-danger">*</span>
           </label>
-          <input id="apellido" type="text" className="form-control"
-            value={formData.apellido} onChange={handleChange} />
+          <input
+            id="apellido"
+            type="text"
+            className="form-control"
+            value={formData.apellido}
+            onChange={handleChange}
+            required
+          />
         </div>
       </div>
     </form>

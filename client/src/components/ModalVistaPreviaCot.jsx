@@ -1,32 +1,3 @@
-// ModalVistaPreviaCot.jsx
-//ESTE MODAL MUESTRA LA VISTA PREVIA DE LA COTIZACIÓN
-//PERMITE VER TODOS LOS DETALLES DE LA COTIZACIÓN ANTES DE DESCARGAR EL PDF O CERRAR EL MODAL
-//INCLUYE DATOS DEL CLIENTE, VENDEDOR, PRODUCTOS, RESUMEN FISCAL Y OBSERVACIONES
-//TAMBIÉN MUESTRA UNA ALERTA VISUAL SI LA COTIZACIÓN ESTÁ PRÓXIMA A VENCER O SI YA SE HA ENVIADO UNA ALERTA
-//Cómo se calcula el Resumen Fiscal:
-//1. 	Base 21% (productos):
-//Es la suma de todos los productos que pagan IVA al 21%. En tu ejemplo: $86.48.
-//2. 	Base 10.5% (productos):
-//Es la suma de los productos que pagan IVA reducido del 10.5%. En este caso no hay, por eso es $0.00.
-//3. 	Costo de envío:
-//Se agrega el costo de envío de la cotización. Aquí: $10.00.
-//4. 	IVA 21% (incluye envío):
-//Se calcula el 21% sobre la base de productos al 21% más el envío.
-//[(86.48 + 10.00) × 0.21 = 20.26]
-//5. 	IVA 10.5%:
-//Se calcula el 10.5% sobre la base de productos que tributan esa tasa. Como no hay, queda $0.00.
-//6. 	Descuentos:
-//Si hubiera descuentos aplicados, se restan aquí. En este caso: $0.00.
-//7. 	Base imponible (incluye envío):
-//Es la suma de las bases de productos más el envío.
-//[86.48 + 0.00 + 10.00 = 96.48]
-//8. 	Total Final:
-//Es la base imponible + IVA 21% + IVA 10.5% – descuentos.
-//[96.48 + 20.26 + 0.00 – 0.00 = 116.74]
-
-//Primero se suman los productos y el envío (96.48).
-//Después se calcula el IVA correspondiente (20.26).
-//Finalmente se suman ambos y se restan descuentos, dando el Total Final: 116.74.
 
 import React from 'react';
 import jsPDF from 'jspdf';

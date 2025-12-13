@@ -1,3 +1,4 @@
+// src/pages/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { useUser } from "../context/UserContext";
 import { NavLink } from 'react-router-dom';
@@ -29,11 +30,12 @@ const Dashboard = () => {
   const [hasta, setHasta] = useState('');
   const [buscar, setBuscar] = useState('');
 
-  // cargar datos desde el nuevo endpoint
+  // cargar datos desde el endpoint
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios.get("/api/cotizaciones/dashboard", {
-      headers: { Authorization: `Bearer ${token}` }
+    axios.get(`${process.env.REACT_APP_API_BASE}/api/cotizaciones/dashboard`, {
+      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true
     })
       .then(res => {
         console.log("Cotizaciones recibidas:", res.data);
@@ -60,12 +62,12 @@ const Dashboard = () => {
   const kpiPend = pendientes.length;
   const kpiVenc = vencidas.length;
 
-  // 🔹 Ticket promedio general
+  // Ticket promedio general
   const ticket = (
     all.reduce((acc, r) => acc + Number(r.total || 0), 0) / (kpiCot || 1)
   ) || 0;
 
-  // 🔹 Tasas por estado
+  // Tasas por estado
   const tasaAcept = ((kpiAcept / kpiCot) * 100).toFixed(1);
   const tasaRech = ((kpiRech / kpiCot) * 100).toFixed(1);
   const tasaPend = ((kpiPend / kpiCot) * 100).toFixed(1);
@@ -101,8 +103,11 @@ const Dashboard = () => {
       if (fr && !r.cliente_nombre?.toLowerCase().includes(fr)) return false;
       if (fp && !r.productos?.toLowerCase().includes(fp)) return false;
       if (fm && !r.marcas?.toLowerCase().includes(fm)) return false;
-      if (fd && r.fecha < fd) return false;
-      if (fh && r.fecha > fh) return false;
+
+      // 🔹 Comparación de fechas segura
+      if (fd && new Date(r.fecha) < new Date(fd)) return false;
+      if (fh && new Date(r.fecha) > new Date(fh)) return false;
+
       if (fb && !(`${r.id} ${r.cliente_nombre} ${r.usuario_nombre}`.toLowerCase().includes(fb))) return false;
 
       return true;
@@ -126,7 +131,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="encabezado-fijo " >
+      <div className="encabezado-fijo">
         <Sidebar />
         <div className="background-container-prod">
           <header className="header">
@@ -160,7 +165,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* KPIS */}
+      {/* KPIs */}
       <main className="dash" style={{ marginTop: '15%' }}>
         <KpiGridDashb
           kpiCot={kpiCot}
