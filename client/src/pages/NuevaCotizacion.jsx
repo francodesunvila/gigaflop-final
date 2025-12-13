@@ -1513,7 +1513,7 @@ useEffect(() => {
 
 
 
-// ESTA FUNCION PARA COMPARTIR ❌
+// ✅ Función para enviar cotización al cliente
 const enviarCotizacionAlCliente = async (payloadEnviar, idCotizacion, token) => {
   try {
     const sendResp = await axios.put(
@@ -1528,16 +1528,15 @@ const enviarCotizacionAlCliente = async (payloadEnviar, idCotizacion, token) => 
       }
     );
 
-
-      return { ok: true, data: sendResp.data };
-    } catch (error) {
-      console.error('Error al enviar la cotización:', error.response?.data || error.message || error);
-      return {
-        ok: false,
-        error: error.response?.data?.error || error.response?.data?.message || 'No se pudo enviar la cotización'
-      };
-    }
-  };
+    return { ok: true, data: sendResp.data };
+  } catch (error) {
+    console.error('Error al enviar la cotización:', error.response?.data || error.message || error);
+    return {
+      ok: false,
+      error: error.response?.data?.error || error.response?.data?.message || 'No se pudo enviar la cotización'
+    };
+  }
+};
 
 
 

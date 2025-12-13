@@ -18,7 +18,7 @@ router.get("/todas", authRequired, cotizacionController.obtenerTodasLasCotizacio
 router.get("/borrador/:id_usuario", authRequired, cotizacionController.obtenerCotizacionesBorrador);
 router.get("/borrador/retomar/:id", authRequired, cotizacionController.obtenerCotizacionBorradorPorId);
 
-// Finalizar
+// Finalizar (✅ usa PUT)
 router.put("/finalizar/:id", authRequired, cotizacionController.finalizarCotizacion);
 
 // Ver completa
