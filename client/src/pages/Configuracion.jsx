@@ -30,16 +30,18 @@ const Configuracion = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.get("/api/configuracion/datos-fiscales", {
+    axios.get(`${process.env.REACT_APP_API_BASE}/api/configuracion/datos-fiscales`, {
       headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true
     })
     .then((res) => {
       setEmpresa(res.data && Object.keys(res.data).length > 0 ? res.data : null);
     })
     .catch((err) => console.error("Error al obtener datos fiscales:", err));
 
-    axios.get("/api/configuracion/usuarios", {
+    axios.get(`${process.env.REACT_APP_API_BASE}/api/configuracion/usuarios`, {
       headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true
     })
     .then((res) => setUsuarios(res.data))
     .catch((err) => console.error("Error al obtener usuarios:", err));
@@ -60,8 +62,9 @@ const Configuracion = () => {
   };
 
   const handleSubmitNuevoUsuario = (nuevoUsuario) => {
-    axios.post("/api/configuracion/usuarios", nuevoUsuario, {
+    axios.post(`${process.env.REACT_APP_API_BASE}/api/configuracion/usuarios`, nuevoUsuario, {
       headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true
     })
     .then((res) => {
       setUsuarios([...usuarios, { id: res.data.id, ...nuevoUsuario }]);
@@ -90,8 +93,9 @@ const Configuracion = () => {
   };
 
   const handleSubmitEditarUsuario = (usuarioActualizado) => {
-    axios.put(`/api/configuracion/usuarios/${usuarioActualizado.id}`, usuarioActualizado, {
-      headers: { Authorization: `Bearer ${token}` }
+    axios.put(`${process.env.REACT_APP_API_BASE}/api/configuracion/usuarios/${usuarioActualizado.id}`, usuarioActualizado, {
+      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true
     })
     .then(() => {
       setUsuarios(prev =>
@@ -99,7 +103,6 @@ const Configuracion = () => {
       );
       setMensajeEditar("✅ Usuario actualizado correctamente");
       setExitoEditar(true);
-      // 👇 ya no cerramos el modal automáticamente
     })
     .catch(err => {
       console.error("Error al actualizar usuario:", err);
@@ -107,7 +110,6 @@ const Configuracion = () => {
       setExitoEditar(false);
     });
   };
-
   // ---------- EMPRESA ----------
   const handleUpdateEmpresa = (datosEmpresa) => {
     if (!datosEmpresa) {
@@ -117,10 +119,11 @@ const Configuracion = () => {
     }
 
     const metodo = empresa ? "put" : "post";
-    const url = "/api/configuracion/datos-fiscales";
+    const url = `${process.env.REACT_APP_API_BASE}/api/configuracion/datos-fiscales`;
 
     axios[metodo](url, datosEmpresa, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true
     })
     .then((res) => {
       const empresaConId = metodo === "post"
@@ -145,7 +148,6 @@ const Configuracion = () => {
   return (
     <>
       {/* HEADER */}
-      
       <div className="encabezado-fijo">
         <Sidebar />
         <div className="background-container-menu">
@@ -158,52 +160,36 @@ const Configuracion = () => {
             </div>
           </header>
 
-         <div className="option">
-  {/* Dashboard: admin y gerente */}
-  {(usuario?.rol === "administrador" || usuario?.rol === "gerente") && (
-    <NavLink className="option-button" to="/dashboard">Dashboard</NavLink>
-  )}
-
-  {/* Cotizaciones: todos */}
-  <NavLink className="option-button" to="/menu">Cotizaciones</NavLink>
-
-  {/* Clientes y Productos: solo vendedor y admin */}
-  {(usuario?.rol === "administrador" || usuario?.rol === "vendedor") && (
-    <>
-      <NavLink className="option-button" to="/clientes">Clientes</NavLink>
-      <NavLink className="option-button" to="/productos">Productos</NavLink>
-    </>
-  )}
-
-  {/* Configuración: solo admin */}
-  {usuario?.rol === "administrador" && (
-    <NavLink className="option-button2" to="/configuracion">Configuración</NavLink>
-  )}
-</div> 
+          <div className="option">
+            {(usuario?.rol === "administrador" || usuario?.rol === "gerente") && (
+              <NavLink className="option-button" to="/dashboard">Dashboard</NavLink>
+            )}
+            <NavLink className="option-button" to="/menu">Cotizaciones</NavLink>
+            {(usuario?.rol === "administrador" || usuario?.rol === "vendedor") && (
+              <>
+                <NavLink className="option-button" to="/clientes">Clientes</NavLink>
+                <NavLink className="option-button" to="/productos">Productos</NavLink>
+              </>
+            )}
+            {usuario?.rol === "administrador" && (
+              <NavLink className="option-button2" to="/configuracion">Configuración</NavLink>
+            )}
+          </div>
         </div>
-      
 
-      {/* TOPBAR */}
-      <section className="menu-superior-prod" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px'}}>
-        <div className="cotizatitlecontainer">
-          <h1 className="cotizatitle"  >Configuración</h1>
-          
-        </div>
-       <button
-  type="button"
-  className="nc"
-  onClick={handleOpenModal}
->
-  + Nuevo usuario
-</button> 
-      </section>
+        {/* TOPBAR */}
+        <section className="menu-superior-prod" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px'}}>
+          <div className="cotizatitlecontainer">
+            <h1 className="cotizatitle">Configuración</h1>
+          </div>
+          <button type="button" className="nc" onClick={handleOpenModal}>
+            + Nuevo usuario
+          </button>
+        </section>
       </div>
 
       {/* CONTENIDO */}
-      <main className="config-page"style={{marginTop: '15%', width: '100%',
-    height: '29vw',
-    padding: '10px',
-    overflowY: 'auto'}}>
+      <main className="config-page" style={{marginTop: '15%', width: '100%', height: '29vw', padding: '10px', overflowY: 'auto'}}>
         <CompanyData
           empresa={empresa || {
             razon_social: "",
@@ -217,14 +203,14 @@ const Configuracion = () => {
           mensaje={mensajeEmpresa}
           esExito={esExito}
           onRefresh={() => {
-            axios.get("/api/configuracion/datos-fiscales", {
-              headers: { Authorization: `Bearer ${token}` }
+            axios.get(`${process.env.REACT_APP_API_BASE}/api/configuracion/datos-fiscales`, {
+              headers: { Authorization: `Bearer ${token}` },
+              withCredentials: true
             })
               .then(res => setEmpresa(res.data))
               .catch(err => console.error("Error al refrescar datos fiscales:", err));
           }}
         />
-        {/* 👇 la lista SIEMPRE visible */}
         <UserTable usuarios={usuarios} onEdit={handleOpenEditModal} />
       </main>
 
@@ -281,4 +267,5 @@ const Configuracion = () => {
     </>
   );
 };
+
 export default Configuracion;

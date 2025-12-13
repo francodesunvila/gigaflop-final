@@ -6,11 +6,14 @@ const PrivateRoute = ({ children, roles }) => {
   const { usuario, cargando } = useUser();
 
   if (cargando) {
-    return <p>Cargando...</p>; // mientras se verifica el usuario
+    return <div className="spinner-container">Verificando sesión...</div>;
   }
 
-  if (!usuario || !roles.includes(usuario.rol)) {
-    // si no hay usuario o el rol no está permitido
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (roles && usuario?.rol && !roles.includes(usuario.rol)) {
     return <Navigate to="/menu" replace />;
   }
 
