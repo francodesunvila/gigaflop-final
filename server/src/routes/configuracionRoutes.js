@@ -6,25 +6,63 @@ import * as configuracionControllers from "../controllers/configuracionControlle
 
 const router = Router();
 
-// Usuarios
-//este metodo es solo para administradores listar usuarios
-router.get("/usuarios", authRequired, authorize(["administrador"]), configuracionControllers.listarUsuarios);
+/**
+ * 📌 Rutas de Configuración
+ * Responsabilidades:
+ * - Usuarios: alta, listado, actualización de rol/estado (solo administradores)
+ * - Datos fiscales: guardar y recuperar CUIT, razón social, email, dirección, contacto principal (solo administradores)
+ */
 
-//este metodo es solo para administradores crear usuarios
-router.post("/usuarios", authRequired, authorize(["administrador"]), configuracionControllers.crearUsuario);
+// ================== Usuarios ==================
 
-// este método es solo para administradores editar usuarios
-router.put("/usuarios/:id", authRequired, authorize(["administrador"]), configuracionControllers.actualizarUsuario);
+// Listar usuarios (solo administradores)
+router.get(
+  "/usuarios",
+  authRequired,
+  authorize(["administrador"]),
+  configuracionControllers.listarUsuarios
+);
 
-// Datos fiscales
+// Crear usuario (solo administradores)
+router.post(
+  "/usuarios",
+  authRequired,
+  authorize(["administrador"]),
+  configuracionControllers.crearUsuario
+);
+
+// Actualizar usuario (solo administradores)
+router.put(
+  "/usuarios/:id",
+  authRequired,
+  authorize(["administrador"]),
+  configuracionControllers.actualizarUsuario
+);
+
+// ================== Datos fiscales ==================
 
 // Crear datos fiscales (solo administradores)
-router.post("/datos-fiscales",authRequired,authorize(["administrador"]),configuracionControllers.crearDatosFiscales);
+router.post(
+  "/datos-fiscales",
+  authRequired,
+  authorize(["administrador"]),
+  configuracionControllers.crearDatosFiscales
+);
 
+// Obtener datos fiscales (solo administradores)
+router.get(
+  "/datos-fiscales",
+  authRequired,
+  authorize(["administrador"]),
+  configuracionControllers.obtenerDatosFiscales
+);
 
-//estos metodos son solo para administradores ver
-router.get("/datos-fiscales", authRequired, authorize(["administrador"]), configuracionControllers.obtenerDatosFiscales);
-//estos metodos son solo para administradores actualizar
-router.put("/datos-fiscales", authRequired, authorize(["administrador"]), configuracionControllers.actualizarDatosFiscales);
+// Actualizar datos fiscales (solo administradores)
+router.put(
+  "/datos-fiscales",
+  authRequired,
+  authorize(["administrador"]),
+  configuracionControllers.actualizarDatosFiscales
+);
 
 export default router;

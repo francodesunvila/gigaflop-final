@@ -1,51 +1,40 @@
-import { Router } from 'express';
-import { authRequired } from '../middlewares/validateToken.js';
-import {
-  iniciarCotizacion,
-  obtenerCotizacionesBorrador,
-  finalizarCotizacion,
-  verCotizacionCompleta,
-  obtenerCotizacionBorradorPorId,
-  actualizarCotizacionBorrador,
-  marcarCotizacionComoPendiente,
-  actualizarEstado,
-  obtenerTodasLasCotizaciones,
-  listarCotizacionesDashboard
-} from '../controllers/cotizacionController.js';
-import * as cotizacionController from '../controllers/cotizacionController.js';
+// src/routes/cotizacionRoutes.js
+import { Router } from "express";
+import { authRequired } from "../middlewares/validateToken.js";
+import * as cotizacionController from "../controllers/cotizacionController.js";
 
 const router = Router();
 
 // Crear cotización
-router.post('/iniciar', authRequired, iniciarCotizacion);
+router.post("/iniciar", authRequired, cotizacionController.iniciarCotizacion);
 
 // Todas las cotizaciones de un usuario específico
-router.get('/todas/usuario/:id_usuario', authRequired, obtenerTodasLasCotizaciones);
+router.get("/todas/usuario/:id_usuario", authRequired, cotizacionController.obtenerTodasLasCotizaciones);
 
 // Todas las cotizaciones (según token/rol)
-router.get('/todas', authRequired, obtenerTodasLasCotizaciones);
+router.get("/todas", authRequired, cotizacionController.obtenerTodasLasCotizaciones);
 
 // Borradores
-router.get('/borrador/:id_usuario', authRequired, obtenerCotizacionesBorrador);
-router.get('/borrador/retomar/:id', authRequired, obtenerCotizacionBorradorPorId);
+router.get("/borrador/:id_usuario", authRequired, cotizacionController.obtenerCotizacionesBorrador);
+router.get("/borrador/retomar/:id", authRequired, cotizacionController.obtenerCotizacionBorradorPorId);
 
 // Finalizar
-router.put('/finalizar/:id', authRequired, finalizarCotizacion);
+router.put("/finalizar/:id", authRequired, cotizacionController.finalizarCotizacion);
 
 // Ver completa
-router.get('/ver/:id', authRequired, verCotizacionCompleta);
+router.get("/ver/:id", authRequired, cotizacionController.verCotizacionCompleta);
 
 // Actualizar borrador
-router.put('/:id/actualizar', authRequired, actualizarCotizacionBorrador);
+router.put("/:id/actualizar", authRequired, cotizacionController.actualizarCotizacionBorrador);
 
 // Cambiar estado
-router.put('/estado/pendiente/:id', marcarCotizacionComoPendiente);
-router.put('/estado/:id', actualizarEstado);
+router.put("/estado/pendiente/:id", cotizacionController.marcarCotizacionComoPendiente);
+router.put("/estado/:id", cotizacionController.actualizarEstado);
 
 // Alerta vencimiento
-router.post('/alerta-vencimiento/:id', cotizacionController.enviarAlertaVencimiento);
+router.post("/alerta-vencimiento/:id", cotizacionController.enviarAlertaVencimiento);
 
 // Dashboard
-router.get('/dashboard', listarCotizacionesDashboard);
+router.get("/dashboard", cotizacionController.listarCotizacionesDashboard);
 
 export default router;

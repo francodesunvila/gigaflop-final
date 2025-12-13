@@ -1,38 +1,35 @@
-//Dos grandes responsabilidades:
-//Usuarios: alta, listado, actualización de rol/estado.
-//Datos fiscales: guardar y recuperar CUIT, razón social, email, dirección, contacto principal.
-
 // src/controllers/ConfiguracionController.js
 import * as ConfiguracionModels from "../models/ConfiguracionModels.js";
 
-// ver usuarios por parte de administradores
+// 📌 Listar usuarios (solo administradores)
 export const listarUsuarios = async (req, res) => {
   try {
     const usuarios = await ConfiguracionModels.getUsuarios();
-    res.json(usuarios);
+    res.status(200).json(usuarios);
   } catch (error) {
-    res.status(500).json({ message: "Error al listar usuarios" });
+    console.error("Error en listarUsuarios:", error);
+    res.status(500).json({ message: "❌ Error al listar usuarios" });
   }
 };
 
-// crear usuario por parte de administradores
+// 📌 Crear usuario (solo administradores)
 export const crearUsuario = async (req, res) => {
   try {
     const { usuario, email, password, nombre, apellido, rol, estado } = req.body;
 
     if (!usuario || !email || !password || !nombre || !apellido || !rol || estado === undefined) {
-      return res.status(400).json({ message: "Faltan campos obligatorios" });
+      return res.status(400).json({ message: "⚠️ Faltan campos obligatorios" });
     }
 
     const id = await ConfiguracionModels.createUsuario(req.body);
-    res.json({ message: "Usuario creado", id });
+    res.status(201).json({ message: "✅ Usuario creado", id });
   } catch (error) {
     console.error("Error en crearUsuario:", error);
-    res.status(500).json({ message: "Error al crear usuario" });
+    res.status(500).json({ message: "❌ Error al crear usuario" });
   }
 };
 
-// actualizar usuario por parte de administradores
+// 📌 Actualizar usuario (solo administradores)
 export const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,25 +40,25 @@ export const actualizarUsuario = async (req, res) => {
     }
 
     await ConfiguracionModels.updateUsuario(id, req.body);
-    res.json({ message: "✅ Usuario actualizado correctamente" });
+    res.status(200).json({ message: "✅ Usuario actualizado correctamente" });
   } catch (error) {
     console.error("Error en actualizarUsuario:", error.sqlMessage || error);
     res.status(500).json({ message: "❌ Error al actualizar usuario" });
   }
 };
 
-// obtener datos fiscales
+// 📌 Obtener datos fiscales
 export const obtenerDatosFiscales = async (req, res) => {
   try {
     const datos = await ConfiguracionModels.getDatosFiscales();
-    res.json(datos);
+    res.status(200).json(datos);
   } catch (error) {
     console.error("Error en obtenerDatosFiscales:", error);
     res.status(500).json({ message: "❌ Error al obtener datos fiscales" });
   }
 };
 
-// actualizar datos fiscales
+// 📌 Actualizar datos fiscales
 export const actualizarDatosFiscales = async (req, res) => {
   try {
     const { id, cuit, razon_social, email, direccion, contacto_principal, condicion_fiscal } = req.body;
@@ -71,14 +68,14 @@ export const actualizarDatosFiscales = async (req, res) => {
     }
 
     await ConfiguracionModels.updateDatosFiscales(req.body);
-    res.json({ message: "✅ Datos fiscales actualizados correctamente" });
+    res.status(200).json({ message: "✅ Datos fiscales actualizados correctamente" });
   } catch (error) {
     console.error("Error en actualizarDatosFiscales:", error.sqlMessage || error);
     res.status(500).json({ message: "❌ Error al actualizar datos fiscales" });
   }
 };
 
-// crear datos fiscales
+// 📌 Crear datos fiscales
 export const crearDatosFiscales = async (req, res) => {
   try {
     const { cuit, razon_social, email, direccion, contacto_principal, condicion_fiscal } = req.body;
@@ -87,9 +84,9 @@ export const crearDatosFiscales = async (req, res) => {
       return res.status(400).json({ message: "⚠️ Faltan campos obligatorios" });
     }
 
-    console.log("Body recibido:", req.body); // 👈 log para depurar
+    console.log("Body recibido:", req.body);
     const id = await ConfiguracionModels.createDatosFiscales(req.body);
-    res.json({ message: "✅ Datos fiscales creados", id });
+    res.status(201).json({ message: "✅ Datos fiscales creados", id });
   } catch (error) {
     console.error("Error en crearDatosFiscales:", error.sqlMessage || error);
     res.status(500).json({ message: "❌ Error al crear datos fiscales" });
