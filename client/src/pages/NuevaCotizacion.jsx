@@ -2033,11 +2033,14 @@ if (idCotizacionActual) {
       // ✅ Cabecera defensiva
       const cabecera = respSave?.data?.cabecera ?? {};
 
-      // ✅ ID de dirección defensivo
-      const direccionIdFinal = direccionIdSeleccionada
-        ?? payloadBorrador.id_direccion_cliente
-        ?? cabecera?.id_direccion_cliente
-        ?? null;
+  // ✅ ID de dirección defensivo
+const direccionIdFinal =
+  direccionIdSeleccionada && direccionIdSeleccionada !== ''
+    ? Number(direccionIdSeleccionada)
+    : payloadBorrador?.id_direccion_cliente
+    ?? cabecera?.id_direccion_cliente
+    ?? null;
+
 
       // ✅ Contacto y dirección desde clienteObjeto si están disponibles
       const contactoDesdeCliente = clienteObjeto?.contactos?.find(c => c.id === Number(contacto));
@@ -2438,73 +2441,74 @@ console.log('contacto state:', contacto, typeof contacto);
         </div>
 
         {/* Cliente */}
-        <div className="card card-soft mb-3">
-          <div className="card-body p-3">
-            <h5 className="section-title"><i className="bi bi-person-badge"></i> Cliente</h5>
-            <div className="row g-3">
+<div className="card card-soft mb-3">
+  <div className="card-body p-3">
+    <h5 className="section-title"><i className="bi bi-person-badge"></i> Cliente</h5>
+    <div className="row g-3">
 
-              {/* Input de búsqueda */}
-              <div className="col-md-6 buscador-cliente-container">
-                <label className="form-label">Cliente / CUIT<span style={{ color: 'red' }}>*</span></label>
+      {/* Input de búsqueda */}
+      <div className="col-md-6 buscador-cliente-container">
+        <label className="form-label">Cliente / CUIT<span style={{ color: 'red' }}>*</span></label>
 
-                {clienteObjeto ? (
-                  <div className="form-control bg-light">
-                    {clienteObjeto.razon_social} – CUIT: {clienteObjeto.cuit}
-                  </div>
-                ) : (
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Buscar cliente por nombre o CUIT"
-                    value={busquedaCliente}
-                    onChange={(e) => setBusquedaCliente(e.target.value)}
-                  />
-                )}
+        {clienteObjeto ? (
+          <div className="form-control bg-light">
+            {clienteObjeto.razon_social} – CUIT: {clienteObjeto.cuit}
+          </div>
+        ) : (
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Buscar cliente por nombre o CUIT"
+            value={busquedaCliente}
+            onChange={(e) => setBusquedaCliente(e.target.value)}
+          />
+        )}
 
-                {!clienteObjeto && sugerencias.length > 0 && (
-                  <ul className="sugerencias-lista">
-  {sugerencias.map((c) => (
-    <li
-      key={c.id}
-      className="sugerencia-item"
-      onClick={() => {
-        setClienteSeleccionado(c.id);
-        setCliente(c.id);
-        setClienteObjeto(c);
-        setBusquedaCliente(`${c.razon_social} – CUIT: ${c.cuit}`);
-        setSugerencias([]);
+        {!clienteObjeto && sugerencias.length > 0 && (
+          <ul className="sugerencias-lista">
+            {sugerencias.map((c) => (
+              <li
+                key={c.id}
+                className="sugerencia-item"
+                onClick={() => {
+                  // ✅ Guardamos el objeto completo en el state
+                  setCliente(c);
+                  setClienteObjeto(c);
+                  setBusquedaCliente(`${c.razon_social} – CUIT: ${c.cuit}`);
+                  setSugerencias([]);
 
-        axios.get(
-          `${process.env.REACT_APP_API_BASE}/api/clientes/${c.id}/contactos`,
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-          }
-        )
-  .then(({ data }) => {
-    const lista = Array.isArray(data) ? data : [];
-   setContactosCliente(lista);
+                  axios.get(
+                    `${process.env.REACT_APP_API_BASE}/api/clientes/${c.id}/contactos`,
+                    {
+                      withCredentials: true,
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                      }
+                    }
+                  )
+                  .then(({ data }) => {
+                    const lista = Array.isArray(data) ? data : [];
+                    setContactosCliente(lista);
 
-const contactoPreservado = lista.find(
-  ct => String(ct.id) === String(contacto)
-);
-setContacto(contactoPreservado?.id || '');
-})
-.catch(err => {
-  console.error('Error al cargar contactos del cliente', err);
-  setContactosCliente([]);
-  setContacto('');
-});
-}}
->
-  {c.razon_social} – CUIT: {c.cuit}
-</li>
-))}
-</ul>
-)}
-</div>
+                    // ✅ Guardamos el objeto completo del contacto preservado
+                    const contactoPreservado = lista.find(
+                      ct => String(ct.id) === String(contacto?.id)
+                    );
+                    setContacto(contactoPreservado || null);
+                  })
+                  .catch(err => {
+                    console.error('Error al cargar contactos del cliente', err);
+                    setContactosCliente([]);
+                    setContacto(null);
+                  });
+                }}
+              >
+                {c.razon_social} – CUIT: {c.cuit}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
 
               {/* Contacto */}
@@ -2557,23 +2561,26 @@ setContacto(contactoPreservado?.id || '');
 
 
 
-            {/* Dirección */}
-            <div className="col-md-3">
-              <label className="form-label">Dirección<span style={{ color: 'red' }}>*</span></label>
-              <select
-                className="form-select"
-                value={direccionIdSeleccionada}
-                onChange={(e) => setDireccionIdSeleccionada(e.target.value)}
-                disabled={modalidadEntrega === 'Retiro'}
-              >
-                <option value="">Seleccionar...</option>
-                {direccionesCliente.map(d => (
-                  <option key={d.id_direccion} value={d.id_direccion}>
-                    {d.locacion} – {d.localidad}, {d.provincia}
-                  </option>
-                ))}
-              </select>
-            </div>
+           {/* Dirección */}
+<div className="col-md-3">
+  <label className="form-label">
+    Dirección<span style={{ color: 'red' }}>*</span>
+  </label>
+  <select
+    className="form-select"
+    value={direccionIdSeleccionada}
+    onChange={(e) => setDireccionIdSeleccionada(Number(e.target.value))}
+    disabled={modalidadEntrega === 'Retiro'}
+  >
+    <option value="">Seleccionar...</option>
+    {direccionesCliente.map((d) => (
+      <option key={d.id_direccion} value={d.id_direccion}>
+        {d.locacion} – {d.localidad}, {d.provincia}
+      </option>
+    ))}
+  </select>
+</div>
+
 
 
 

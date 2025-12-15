@@ -13,8 +13,8 @@ async function startServer() {
 
     console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
-    // ✅ Usar solo process.env.PORT en Render
-    const PORT = process.env.PORT;
+    // ✅ Usa process.env.PORT si existe (Render), o 4000 en local
+    const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(`>>>>>>>> Servidor corriendo en el puerto ${PORT} <<<<<<<<`);
     });
